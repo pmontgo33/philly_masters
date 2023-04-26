@@ -21,3 +21,22 @@ class Golfer(models.Model):
     rd_four_strokes = models.SmallIntegerField(default=0)
 
     # TODO Add @property for applicable world ranking
+
+
+class Tournament(models.Model):
+    STATE_CHOICES = [
+        ("NST", "Not Started"),
+        ("RD1", "Round 1"),
+        ("RD2", "Round 2"),
+        ("RD3", "Round 3"),
+        ("RD4", "Round 4"),
+        ("FNL", "FINAL"),
+    ]
+    name = models.CharField(max_length=200)
+    start_date = models.DateField()
+    state = models.CharField(choices=STATE_CHOICES, max_length=3)
+    world_ranking_week = models.SmallIntegerField(default=1)
+
+    @property
+    def year(self):
+        return self.start_date.year()

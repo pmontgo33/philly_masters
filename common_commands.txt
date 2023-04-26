@@ -1,0 +1,17 @@
+These are common commands used in this project
+
+# BUILD THE STACK
+docker compose -f local.yml build
+
+# MIGRATE AND RUNSERVER
+docker compose -f local.yml up
+
+# MAKEMIGRATIONS
+docker compose -f local.yml run --rm django python manage.py makemigrations
+
+# PYTEST
+docker compose -f local.yml run --rm django pytest
+
+# COVERAGE
+docker compose -f local.yml run --rm django coverage run -m pytest
+docker compose -f local.yml run --rm django coverage report
