@@ -3,10 +3,11 @@ import pytest
 from golf_contest.models import Golfer
 
 
-@pytest.mark.django_db
-def test_golfer_create():
-    Golfer.objects.create(name="Tiger Woods", tournament_position=2)
+def test_golfer_create(db):
+    new_golfer = Golfer.objects.create(name="Tiger Woods", tournament_position=2)
     assert Golfer.objects.count() == 1
+    assert new_golfer.name == "Tiger Woods"
+    assert new_golfer.tournament_position == 2
 
 
 @pytest.fixture()
