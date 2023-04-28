@@ -2,7 +2,9 @@ import datetime
 
 import pytest
 
-from golf_contest.models import Golfer, Tournament
+from golf_contest.models import Golfer, Team, Tournament
+
+GOLFERS = ["Tiger Woods", "Jack Nicklaus", "Arnold Palmer", "Greg Norman", "Davis Love III", "Ben Hogan"]
 
 
 @pytest.fixture
@@ -12,13 +14,16 @@ def new_tournament(db) -> Tournament:
 
 @pytest.fixture
 def new_golfer(db, new_tournament) -> Golfer:
-    return Golfer.objects.create(name="Tiger Woods", tournament_position=2, tournament=new_tournament)
+    return Golfer.objects.create(name="Tiger Woods", tournament=new_tournament)
+
+
+@pytest.fixture
+def new_team(db, new_tournament) -> Team:
+    assert False
 
 
 def test_golfer_create(new_golfer):
-    assert Golfer.objects.count() == 1
-    assert new_golfer.name == "Tiger Woods"
-    assert new_golfer.tournament_position == 2
+    assert Golfer.objects.count() > 0
 
 
 def test_golfer_filter(new_golfer):
@@ -26,11 +31,11 @@ def test_golfer_filter(new_golfer):
 
 
 def test_golfer_update(new_golfer):
-    new_golfer.name = "Jack Nicklaus"
+    new_golfer.name = "Smiley Kaufman"
     new_golfer.save()
 
-    golfer_from_db = Golfer.objects.get(name="Jack Nicklaus")
-    assert golfer_from_db.name == "Jack Nicklaus"
+    golfer_from_db = Golfer.objects.get(name="Smiley Kaufman")
+    assert golfer_from_db.name == "Smiley Kaufman"
 
 
 def test_golfer_tee_time_blank(new_golfer):

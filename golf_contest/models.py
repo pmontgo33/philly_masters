@@ -46,15 +46,16 @@ class Tournament(models.Model):
     # TODO: Add @property for tournament winner which (if the tournament is over) filters Golfers for this tournament,
     # and returns the one with the lowest score
 
-    class Team(models.Model):
-        name = models.CharField(max_length=30)
-        user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-        tournament = models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE)
-        golfers = models.ManyToManyField("Golfer")
 
-        def add_golfer(self, new_golfer):
-            if self.golfers.count() < 5:
-                if new_golfer.tournament == self.tournament:
-                    self.golfers.add(new_golfer)
+class Team(models.Model):
+    name = models.CharField(max_length=30)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    tournament = models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE)
+    golfers = models.ManyToManyField("Golfer")
 
-        # TODO: Check over Team, makemigrations, migrate, and create tests for Team
+    def add_golfer(self, new_golfer):
+        if self.golfers.count() < 5:
+            if new_golfer.tournament == self.tournament:
+                self.golfers.add(new_golfer)
+
+    # TODO: Check over Team, makemigrations, migrate, and create tests for Team
