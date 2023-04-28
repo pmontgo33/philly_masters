@@ -6,6 +6,7 @@ updates:
   # Update GitHub actions in workflows
   - package-ecosystem: 'github-actions'
     directory: '/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'
@@ -17,6 +18,7 @@ updates:
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the `compose/local/django` directory
     directory: 'compose/local/django/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'
@@ -30,6 +32,7 @@ updates:
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the `compose/local/docs` directory
     directory: 'compose/local/docs/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'
@@ -43,6 +46,7 @@ updates:
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the `compose/local/node` directory
     directory: 'compose/local/node/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'
@@ -50,6 +54,7 @@ updates:
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the `compose/production/aws` directory
     directory: 'compose/production/aws/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'
@@ -57,6 +62,7 @@ updates:
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the `compose/production/django` directory
     directory: 'compose/production/django/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'
@@ -70,6 +76,7 @@ updates:
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the `compose/production/postgres` directory
     directory: 'compose/production/postgres/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'
@@ -77,6 +84,7 @@ updates:
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the `compose/production/traefik` directory
     directory: 'compose/production/traefik/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'
@@ -86,6 +94,7 @@ updates:
     # Look for a `requirements.txt` in the `root` directory
     # also 'setup.cfg', 'runtime.txt' and 'requirements/*.txt'
     directory: '/'
+    target-branch: 'develop'
     # Every weekday
     schedule:
       interval: 'daily'

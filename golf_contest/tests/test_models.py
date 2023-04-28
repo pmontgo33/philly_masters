@@ -6,13 +6,13 @@ from golf_contest.models import Golfer, Tournament
 
 
 @pytest.fixture
-def new_golfer(db) -> Golfer:
-    return Golfer.objects.create(name="Tiger Woods", tournament_position=2)
+def new_tournament(db) -> Tournament:
+    return Tournament.objects.create(name="The Masters", start_date=datetime.date(year=2023, month=4, day=6))
 
 
 @pytest.fixture
-def new_tournament(db) -> Tournament:
-    return Tournament.objects.create(name="The Masters", start_date=datetime.date(year=2023, month=4, day=6))
+def new_golfer(db, new_tournament) -> Golfer:
+    return Golfer.objects.create(name="Tiger Woods", tournament_position=2, tournament=new_tournament)
 
 
 def test_golfer_create(new_golfer):
@@ -31,6 +31,18 @@ def test_golfer_update(new_golfer):
 
     golfer_from_db = Golfer.objects.get(name="Jack Nicklaus")
     assert golfer_from_db.name == "Jack Nicklaus"
+
+
+def test_golfer_tee_time_blank(new_golfer):
+    assert new_golfer.rd_one_tee_time is None
+
+
+def test_tournament_contains_golfer(new_golfer, new_tournament):
+    assert new_tournament.golfer_set.filter(pk=new_golfer.pk).exists()
+
+
+def test_golfer_references_tournament(new_golfer, new_tournament):
+    assert new_golfer.tournament == new_tournament
 
 
 def test_tournament_create(new_tournament):
