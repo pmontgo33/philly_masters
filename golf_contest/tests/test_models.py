@@ -3,13 +3,12 @@ import datetime
 import pytest
 
 from golf_contest.models import Golfer, Team, Tournament
-
-GOLFERS = ["Tiger Woods", "Jack Nicklaus", "Arnold Palmer", "Greg Norman", "Davis Love III", "Ben Hogan"]
+from mysite.users.models import User
 
 
 @pytest.fixture
 def new_tournament(db) -> Tournament:
-    return Tournament.objects.create(name="The Masters", start_date=datetime.date(year=2023, month=4, day=6))
+    return Tournament.objects.create(name="Philly", start_date=datetime.date(year=2023, month=4, day=6))
 
 
 @pytest.fixture
@@ -18,8 +17,15 @@ def new_golfer(db, new_tournament) -> Golfer:
 
 
 @pytest.fixture
-def new_team(db, new_tournament) -> Team:
-    assert False
+def new_team(db) -> Team:
+    # TODO Need to create test users somehow.
+    user1 = User.objects.get(pk=1)
+    team = Team.objects.create(name="Pimento Cheese", user=user1)
+    team.tournament = Tournament.objects.get(pk=1)
+
+    for i in range(5):
+        team.add_golfer(Golfer.objects.get(pk=1))
+    team.save()
 
 
 def test_golfer_create(new_golfer):
@@ -51,13 +57,13 @@ def test_golfer_references_tournament(new_golfer, new_tournament):
 
 
 def test_tournament_create(new_tournament):
-    assert Tournament.objects.count() == 1
-    assert new_tournament.name == "The Masters"
+    assert Tournament.objects.count() > 0
+    assert new_tournament.name == "Philly"
     assert new_tournament.start_date == datetime.date(year=2023, month=4, day=6)
 
 
 def test_tournament_filter(new_tournament):
-    assert Tournament.objects.filter(name="The Masters").exists()
+    assert Tournament.objects.filter(name="Philly").exists()
 
 
 def test_tournament_update(new_tournament):
@@ -71,3 +77,15 @@ def test_tournament_update(new_tournament):
 def test_tournament_year_property(new_tournament):
     start_date_year = new_tournament.start_date.year
     assert new_tournament.year == start_date_year
+
+
+def test_team_create(new_team):
+    assert Team.objects.count() > 0
+
+
+def test_team_update(new_team):
+    new_team.name = "Maester Aemon Corner"
+    new_team.save()
+
+    team_from_db = Team.objects.get(name="Maester Aemon Corner")
+    assert team_from_db.name == "Maester Aemon Corner"

@@ -10,19 +10,22 @@ class Golfer(models.Model):
     name = models.CharField(max_length=30)
     tournament_position = models.PositiveSmallIntegerField(default=0)
     score_to_par = models.SmallIntegerField(default=0)
-    tournament = models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE)
+    tournament = models.ForeignKey("Tournament", on_delete=models.CASCADE)
 
     # Rounds
-    rd_one_tee_time = models.TimeField(null=True, default=None)
+    rd_one_tee_time = models.TimeField(null=True, blank=True, default=None)
     rd_one_strokes = models.SmallIntegerField(default=0)
-    rd_two_tee_time = models.TimeField(null=True, default=None)
+    rd_two_tee_time = models.TimeField(null=True, blank=True, default=None)
     rd_two_strokes = models.SmallIntegerField(default=0)
-    rd_three_tee_time = models.TimeField(null=True, default=None)
+    rd_three_tee_time = models.TimeField(null=True, blank=True, default=None)
     rd_three_strokes = models.SmallIntegerField(default=0)
-    rd_four_tee_time = models.TimeField(null=True, default=None)
+    rd_four_tee_time = models.TimeField(null=True, blank=True, default=None)
     rd_four_strokes = models.SmallIntegerField(default=0)
 
     # TODO Add @property for applicable world ranking
+
+    def __str__(self):
+        return self.name
 
 
 class Tournament(models.Model):
@@ -46,6 +49,10 @@ class Tournament(models.Model):
     # TODO: Add @property for tournament winner which (if the tournament is over) filters Golfers for this tournament,
     # and returns the one with the lowest score
 
+    def __str__(self):
+        display_name = str(self.year) + " " + self.name
+        return display_name
+
 
 class Team(models.Model):
     name = models.CharField(max_length=30)
@@ -59,3 +66,6 @@ class Team(models.Model):
                 self.golfers.add(new_golfer)
 
     # TODO: Check over Team, makemigrations, migrate, and create tests for Team
+
+    def __str__(self):
+        return self.name

@@ -1,0 +1,210 @@
+[
+  {
+    "model": "golf_contest.golfer",
+    "pk": 1,
+    "fields": {
+      "name": "Tiger Woods",
+      "tournament_position": 1,
+      "score_to_par": -18,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 2,
+    "fields": {
+      "name": "Tom Kite",
+      "tournament_position": 2,
+      "score_to_par": -6,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 3,
+    "fields": {
+      "name": "Tommy Tolles",
+      "tournament_position": 3,
+      "score_to_par": -5,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 4,
+    "fields": {
+      "name": "Tom Watson",
+      "tournament_position": 4,
+      "score_to_par": -4,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 5,
+    "fields": {
+      "name": "Costantino Rocca",
+      "tournament_position": 5,
+      "score_to_par": -3,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 6,
+    "fields": {
+      "name": "Paul Stankowski",
+      "tournament_position": 5,
+      "score_to_par": -3,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 7,
+    "fields": {
+      "name": "Fred Couples",
+      "tournament_position": 7,
+      "score_to_par": -2,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 8,
+    "fields": {
+      "name": "Bernhard Langer",
+      "tournament_position": 7,
+      "score_to_par": -2,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 9,
+    "fields": {
+      "name": "Justin Leonard",
+      "tournament_position": 7,
+      "score_to_par": -2,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 10,
+    "fields": {
+      "name": "Davis Love III",
+      "tournament_position": 7,
+      "score_to_par": -2,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.golfer",
+    "pk": 11,
+    "fields": {
+      "name": "Jeff Sluman",
+      "tournament_position": 7,
+      "score_to_par": -2,
+      "tournament": 1,
+      "rd_one_tee_time": null,
+      "rd_one_strokes": 0,
+      "rd_two_tee_time": null,
+      "rd_two_strokes": 0,
+      "rd_three_tee_time": null,
+      "rd_three_strokes": 0,
+      "rd_four_tee_time": null,
+      "rd_four_strokes": 0
+    }
+  },
+  {
+    "model": "golf_contest.tournament",
+    "pk": 1,
+    "fields": {
+      "name": "Masters",
+      "start_date": "1997-04-10",
+      "state": "FNL",
+      "world_ranking_week": 0
+    }
+  }
+]
