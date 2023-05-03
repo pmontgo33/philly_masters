@@ -196,15 +196,5 @@
       "rd_four_tee_time": null,
       "rd_four_strokes": 0
     }
-  },
-  {
-    "model": "golf_contest.tournament",
-    "pk": 1,
-    "fields": {
-      "name": "Masters",
-      "start_date": "1997-04-10",
-      "state": "FNL",
-      "world_ranking_week": 0
-    }
   }
 ]
