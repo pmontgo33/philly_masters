@@ -105,7 +105,9 @@ def test_team_add_golfer_in_tournament_spot_available(team_data):
 
 def test_team_add_golfer_not_in_tournament(team_data):
     my_team = team_data[1]
-    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=Tournament.objects.create(name="US Open"))
+    new_golfer = Golfer.objects.create(
+        name="Smiley Kaufman", tournament=Tournament.objects.create(name="US Open", id=2)
+    )
     remove_golfer = my_team.golfers.get(id=3)
 
     my_team.golfers.remove(remove_golfer)
