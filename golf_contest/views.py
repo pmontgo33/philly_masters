@@ -1,3 +1,5 @@
-# from django.shortcuts import render
+from django.shortcuts import render
 
-# Create your views here.
+
+def new_team(request):
+    return render(request, "golf_contest/new_team.html", {})
