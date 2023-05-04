@@ -86,7 +86,7 @@ def test_team_update(team_data):
 
 def test_team_add_too_many_golfers(team_data):
     my_team = team_data[1]
-    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=my_team.tournament)
+    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=my_team.tournament, id=100)
 
     my_team.add_golfer(new_golfer)
     assert new_golfer not in my_team.golfers.all()
@@ -94,7 +94,7 @@ def test_team_add_too_many_golfers(team_data):
 
 def test_team_add_golfer_in_tournament_spot_available(team_data):
     my_team = team_data[1]
-    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=Tournament.objects.get(id=1))
+    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=Tournament.objects.get(id=1), id=100)
     remove_golfer = my_team.golfers.get(id=3)
 
     my_team.golfers.remove(remove_golfer)
@@ -106,7 +106,7 @@ def test_team_add_golfer_in_tournament_spot_available(team_data):
 def test_team_add_golfer_not_in_tournament(team_data):
     my_team = team_data[1]
     new_golfer = Golfer.objects.create(
-        name="Smiley Kaufman", tournament=Tournament.objects.create(name="US Open", id=2)
+        name="Smiley Kaufman", tournament=Tournament.objects.create(name="US Open", id=2), id=100
     )
     remove_golfer = my_team.golfers.get(id=3)
 
