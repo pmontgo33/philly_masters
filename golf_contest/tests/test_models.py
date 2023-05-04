@@ -2,27 +2,6 @@ import datetime
 
 from golf_contest.models import Golfer, Team, Tournament
 
-# @pytest.fixture
-# def new_tournament(db) -> Tournament:
-#     return Tournament.objects.create(name="Philly", start_date=datetime.date(year=2023, month=4, day=6))
-
-
-# @pytest.fixture
-# def new_golfer(db, new_tournament) -> Golfer:
-#     return Golfer.objects.create(name="Tiger Woods", tournament=new_tournament)
-
-
-# @pytest.fixture
-# def new_team(db) -> Team:
-#     # TODO Need to create test users somehow.
-#     user1 = User.objects.get(pk=1)
-#     team = Team.objects.create(name="Pimento Cheese", user=user1)
-#     team.tournament = Tournament.objects.get(pk=1)
-
-#     for i in range(5):
-#         team.add_golfer(Golfer.objects.get(pk=1))
-#     team.save()
-
 
 def test_golfer_create(golfer_data):
     assert Golfer.objects.count() > 0
@@ -79,6 +58,20 @@ def test_tournament_year_property(tournament_data):
     assert tournament_data.year == start_date_year
 
 
+def test_tournament_champion_final(golfer_data):
+    tournament = golfer_data[0].tournament
+
+    winner = tournament.golfer_set.get(id=1)
+    assert winner == tournament.champion
+
+
+def test_tournament_champion_not_final(golfer_data):
+    tournament = golfer_data[0].tournament
+    tournament.state = "RD1"
+
+    assert tournament.champion is None
+
+
 def test_team_create(team_data):
     assert Team.objects.count() > 0
 
@@ -89,3 +82,33 @@ def test_team_update(team_data):
 
     team_from_db = Team.objects.get(name="Top Golf")
     assert team_from_db.name == "Top Golf"
+
+
+def test_team_add_too_many_golfers(team_data):
+    my_team = team_data[1]
+    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=my_team.tournament)
+
+    my_team.add_golfer(new_golfer)
+    assert new_golfer not in my_team.golfers.all()
+
+
+def test_team_add_golfer_in_tournament_spot_available(team_data):
+    my_team = team_data[1]
+    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=Tournament.objects.get(id=1))
+    remove_golfer = my_team.golfers.get(id=3)
+
+    my_team.golfers.remove(remove_golfer)
+
+    my_team.add_golfer(new_golfer)
+    assert new_golfer in my_team.golfers.all()
+
+
+def test_team_add_golfer_not_in_tournament(team_data):
+    my_team = team_data[1]
+    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=Tournament.objects.create(name="US Open"))
+    remove_golfer = my_team.golfers.get(id=3)
+
+    my_team.golfers.remove(remove_golfer)
+
+    my_team.add_golfer(new_golfer)
+    assert new_golfer not in my_team.golfers.all()

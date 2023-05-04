@@ -5,9 +5,6 @@ import pytest
 from golf_contest.models import Golfer, Team, Tournament
 from mysite.users.models import User
 
-# from django.core.management import call_command
-
-
 GOLFERS = [
     {
         "name": "Tiger Woods",
@@ -70,13 +67,14 @@ GOLFERS = [
 @pytest.fixture
 def tournament_data(db):
     return Tournament.objects.create(
-        name="Masters", start_date=datetime.date(year=2023, month=4, day=6), state="FNL", world_ranking_week=0
+        name="Masters", start_date=datetime.date(year=2023, month=4, day=6), state="FNL", world_ranking_week=0, id=1
     )
 
 
 @pytest.fixture
 def golfer_data(db, tournament_data):
     data = []
+    i = 1
     for golfer in GOLFERS:
         data.append(
             Golfer.objects.create(
@@ -84,8 +82,10 @@ def golfer_data(db, tournament_data):
                 tournament_position=golfer["tournament_position"],
                 score_to_par=golfer["score_to_par"],
                 tournament=tournament_data,
+                id=i,
             )
         )
+        i += 1
     return data
 
 
@@ -103,7 +103,7 @@ def user_data(db):
 
 @pytest.fixture
 def team_data(user_data, tournament_data, golfer_data):
-    team1 = Team.objects.create(name="Pimento Cheese", user=user_data[0], tournament=tournament_data)
+    team1 = Team.objects.create(name="Pimento Cheese", user=user_data[0], tournament=tournament_data, id=1)
 
     team1.add_golfer(golfer_data[1])
     team1.add_golfer(golfer_data[3])
@@ -112,7 +112,7 @@ def team_data(user_data, tournament_data, golfer_data):
     team1.add_golfer(golfer_data[9])
     team1.save()
 
-    team2 = Team.objects.create(name="Maester Aemon Corner", user=user_data[1], tournament=tournament_data)
+    team2 = Team.objects.create(name="Maester Aemon Corner", user=user_data[1], tournament=tournament_data, id=2)
 
     team2.add_golfer(golfer_data[2])
     team2.add_golfer(golfer_data[4])

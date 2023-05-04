@@ -46,8 +46,12 @@ class Tournament(models.Model):
     def year(self):
         return self.start_date.year
 
-    # TODO: Add @property for tournament winner which (if the tournament is over) filters Golfers for this tournament,
-    # and returns the one with the lowest score
+    @property
+    def champion(self):
+        if self.state == "FNL":
+            return self.golfer_set.get(tournament_position=1)
+        else:
+            return None
 
     def __str__(self):
         display_name = str(self.year) + " " + self.name
@@ -64,8 +68,6 @@ class Team(models.Model):
         if self.golfers.count() < 5:
             if new_golfer.tournament == self.tournament:
                 self.golfers.add(new_golfer)
-
-    # TODO: Check over Team, makemigrations, migrate, and create tests for Team
 
     def __str__(self):
         return self.name
