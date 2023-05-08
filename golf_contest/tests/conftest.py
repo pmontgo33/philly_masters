@@ -114,11 +114,11 @@ def team_data(user_data, tournament_data, golfer_data):
 
     team2 = Team.objects.create(name="Maester Aemon Corner", user=user_data[1], tournament=tournament_data, id=2)
 
+    team2.add_golfer(golfer_data[0])
     team2.add_golfer(golfer_data[2])
     team2.add_golfer(golfer_data[4])
     team2.add_golfer(golfer_data[6])
     team2.add_golfer(golfer_data[8])
-    team2.add_golfer(golfer_data[10])
     team2.save()
 
     return [team1, team2]

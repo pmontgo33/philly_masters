@@ -114,3 +114,8 @@ def test_team_add_golfer_not_in_tournament(team_data):
 
     my_team.add_golfer(new_golfer)
     assert new_golfer not in my_team.golfers.all()
+
+
+def test_team_score(team_data):
+    my_team = team_data[1]
+    assert my_team.score == -28

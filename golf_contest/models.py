@@ -2,6 +2,7 @@ import datetime
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Max, Sum
 
 # Create your models here.
 
@@ -63,6 +64,23 @@ class Team(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tournament = models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE)
     golfers = models.ManyToManyField("Golfer")
+
+    @property
+    def raw_score(self):
+        if self.golfers.count() > 0:
+            all_golfers_score = self.golfers.all().aggregate(Sum("score_to_par"))["score_to_par__sum"]
+            worst_golfer_score = self.golfers.all().aggregate(Max("score_to_par"))["score_to_par__max"]
+            return all_golfers_score - worst_golfer_score
+        else:
+            return 0
+
+    @property
+    def bonuses(self):
+        return 0
+
+    @property
+    def score(self):
+        return self.raw_score + self.bonuses
 
     def add_golfer(self, new_golfer):
         if self.golfers.count() < 5:

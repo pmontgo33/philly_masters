@@ -1,0 +1,42 @@
+{% extends "golf_contest/base.html" %} {% block content %}
+
+<h1>Standings</h1>
+
+<table id="example" class="display" style="width: 100%">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Participant</th>
+      <th>Golfers</th>
+      <th>Raw Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for team in teams %}
+    <tr class="table-row">
+      <td>{{ team.name }}</td>
+      <td>{{ team.user.email }}</td>
+      <td>{{ team.golfers.all }}</td>
+      <td>{{ team.score }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>Name</th>
+      <th>Participant</th>
+      <th>Golfers</th>
+      <th>Raw Score</th>
+    </tr>
+  </tfoot>
+</table>
+
+{% endblock %} {% block script %}
+<script>
+  $(document).ready(function () {
+    $('#example').DataTable({
+      order: [[3, 'asc']],
+    });
+  });
+</script>
+{% endblock %}
