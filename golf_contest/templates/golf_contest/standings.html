@@ -2,31 +2,37 @@
 
 <h1>Standings</h1>
 
-<table id="example" class="display" style="width: 100%">
+<table id="standingsTable" class="display" style="width: 100%">
   <thead>
     <tr>
+      <th>Place</th>
       <th>Name</th>
       <th>Participant</th>
-      <th>Golfers</th>
       <th>Raw Score</th>
+      <th>Bonuses</th>
+      <th>Team Score</th>
     </tr>
   </thead>
   <tbody>
     {% for team in teams %}
     <tr class="table-row">
+      <td>{{ team.place }}</td>
       <td>{{ team.name }}</td>
       <td>{{ team.user.email }}</td>
-      <td>{{ team.golfers.all }}</td>
+      <td>{{ team.raw_score }}</td>
+      <td>{{ team.bonuses }}</td>
       <td>{{ team.score }}</td>
     </tr>
     {% endfor %}
   </tbody>
   <tfoot>
     <tr>
+      <th>Place</th>
       <th>Name</th>
       <th>Participant</th>
-      <th>Golfers</th>
       <th>Raw Score</th>
+      <th>Bonuses</th>
+      <th>Team Score</th>
     </tr>
   </tfoot>
 </table>
@@ -34,8 +40,8 @@
 {% endblock %} {% block script %}
 <script>
   $(document).ready(function () {
-    $('#example').DataTable({
-      order: [[3, 'asc']],
+    $('#standingsTable').DataTable({
+      order: [[5, 'asc']],
     });
   });
 </script>
