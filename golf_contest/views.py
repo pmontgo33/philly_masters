@@ -9,7 +9,6 @@ def index(request):
 
 def standings(request, pk):
     tournament = Tournament.objects.get(pk=pk)
+    teams = tournament.team_set.all()
 
-    teams = list(tournament.team_set.all())
-    teams.sort(key=lambda d: d.score)
     return render(request, "golf_contest/standings.html", {"tournament": tournament, "teams": teams})
