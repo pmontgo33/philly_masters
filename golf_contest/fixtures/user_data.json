@@ -30,5 +30,21 @@
       "groups": [],
       "user_permissions": []
     }
+  },
+  {
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+      "password": "argon2$argon2id$v=19$m=102400,t=2,p=8$U1NMeW5CZkRNV0x2THFaSkV4bXQweg$demZ2C4r4jRDKtGv44G64ocH/NfghKbH7/fLe+dZHC8",
+      "last_login": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2023-04-30T02:03:32.888Z",
+      "name": "",
+      "email": "user3@test.com",
+      "groups": [],
+      "user_permissions": []
+    }
   }
 ]

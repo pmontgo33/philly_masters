@@ -1,109 +1,74 @@
-import datetime
+import json
+from datetime import datetime
 
 import pytest
 
 from golf_contest.models import Golfer, Team, Tournament
 from mysite.users.models import User
 
-GOLFERS = [
-    {
-        "name": "Tiger Woods",
-        "tournament_position": 1,
-        "score_to_par": -18,
-    },
-    {
-        "name": "Tom Kite",
-        "tournament_position": 2,
-        "score_to_par": -6,
-    },
-    {
-        "name": "Tommy Tolles",
-        "tournament_position": 3,
-        "score_to_par": -5,
-    },
-    {
-        "name": "Tom Watson",
-        "tournament_position": 4,
-        "score_to_par": -4,
-    },
-    {
-        "name": "Costantino Rocca",
-        "tournament_position": 5,
-        "score_to_par": -3,
-    },
-    {
-        "name": "Paul Stankowski",
-        "tournament_position": 5,
-        "score_to_par": -3,
-    },
-    {
-        "name": "Fred Couples",
-        "tournament_position": 7,
-        "score_to_par": -2,
-    },
-    {
-        "name": "Bernhard Langer",
-        "tournament_position": 7,
-        "score_to_par": -2,
-    },
-    {
-        "name": "Justin Leonard",
-        "tournament_position": 7,
-        "score_to_par": -2,
-    },
-    {
-        "name": "Davis Love III",
-        "tournament_position": 7,
-        "score_to_par": -2,
-    },
-    {
-        "name": "Jeff Sluman",
-        "tournament_position": 7,
-        "score_to_par": -2,
-    },
-]
-
 
 @pytest.fixture
-def tournament_data(db):
-    return Tournament.objects.create(
-        name="Masters", start_date=datetime.date(year=2023, month=4, day=6), state="FNL", world_ranking_week=0, id=1
-    )
-
-
-@pytest.fixture
-def golfer_data(db, tournament_data):
-    data = []
-    i = 1
-    for golfer in GOLFERS:
-        data.append(
-            Golfer.objects.create(
-                name=golfer["name"],
-                tournament_position=golfer["tournament_position"],
-                score_to_par=golfer["score_to_par"],
-                tournament=tournament_data,
-                id=i,
-            )
-        )
-        i += 1
+def load_fixture_files():
+    f = open("golf_contest/fixtures/golf_data.json", "rb")
+    data = json.load(f)
+    f.close()
     return data
 
 
 @pytest.fixture
-def user_data(db):
-    user1 = User.objects.create(email="user1@test.com")
-    user1.set_password("password")
-    user1.save()
-    user2 = User.objects.create(email="user2@test.com")
-    user2.set_password("password")
-    user2.save()
+def tournament_data(db, load_fixture_files):
+    fixture_tournaments = [x for x in load_fixture_files if x["model"] == "golf_contest.tournament"]
+    all_tournaments = []
+    for tournament in fixture_tournaments:
+        all_tournaments.append(
+            Tournament.objects.create(
+                name=tournament["fields"]["name"],
+                start_date=datetime.strptime(tournament["fields"]["start_date"], "%Y-%m-%d"),
+                state=tournament["fields"]["state"],
+                world_ranking_week=tournament["fields"]["world_ranking_week"],
+                id=tournament["pk"],
+            )
+        )
+    return all_tournaments
 
-    return [user1, user2]
+
+@pytest.fixture
+def golfer_data(db, load_fixture_files, tournament_data):
+    fixture_golfers = [x for x in load_fixture_files if x["model"] == "golf_contest.golfer"]
+    all_golfers = []
+
+    for golfer in fixture_golfers:
+        all_golfers.append(
+            Golfer.objects.create(
+                name=golfer["fields"]["name"],
+                tournament_position=golfer["fields"]["tournament_position"],
+                score_to_par=golfer["fields"]["score_to_par"],
+                tournament=Tournament.objects.get(id=golfer["fields"]["tournament"]),
+                id=golfer["pk"],
+            )
+        )
+    return all_golfers
+
+
+@pytest.fixture
+def user_data(db, load_fixture_files):
+    fixture_users = [x for x in load_fixture_files if x["model"] == "users.user"]
+    all_users = []
+
+    for user in fixture_users:
+        all_users.append(
+            User.objects.create(
+                email=user["fields"]["email"],
+                password=user["fields"]["password"],
+                id=user["pk"],
+            )
+        )
+    return all_users
 
 
 @pytest.fixture
 def team_data(user_data, tournament_data, golfer_data):
-    team1 = Team.objects.create(name="Pimento Cheese", user=user_data[0], tournament=tournament_data, id=1)
+    team1 = Team.objects.create(name="Pimento Cheese", user=user_data[0], tournament=tournament_data[0], id=1)
 
     team1.add_golfer(golfer_data[1])
     team1.add_golfer(golfer_data[3])
@@ -112,7 +77,7 @@ def team_data(user_data, tournament_data, golfer_data):
     team1.add_golfer(golfer_data[9])
     team1.save()
 
-    team2 = Team.objects.create(name="Maester Aemon Corner", user=user_data[1], tournament=tournament_data, id=2)
+    team2 = Team.objects.create(name="Maester Aemon Corner", user=user_data[1], tournament=tournament_data[0], id=2)
 
     team2.add_golfer(golfer_data[0])
     team2.add_golfer(golfer_data[2])

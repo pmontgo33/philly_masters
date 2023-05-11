@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from golf_contest.models import Golfer, Team, Tournament
 
@@ -12,33 +12,33 @@ def test_golfer_filter(golfer_data):
 
 
 def test_golfer_update(golfer_data):
-    my_golfer = Golfer.objects.get(name="Fred Couples")
+    my_golfer = Golfer.objects.get(id=7)
     my_golfer.name = "Smiley Kaufman"
     my_golfer.save()
 
     golfer_from_db = Golfer.objects.get(name="Smiley Kaufman")
-    assert golfer_from_db.name == "Smiley Kaufman"
+    assert golfer_from_db.id == 7
 
 
 def test_golfer_tee_time_blank(golfer_data):
-    my_golfer = Golfer.objects.get(name="Fred Couples")
+    my_golfer = Golfer.objects.get(id=7)
     assert my_golfer.rd_one_tee_time is None
 
 
 def test_tournament_contains_golfer(golfer_data, tournament_data):
-    my_golfer = Golfer.objects.get(name="Fred Couples")
-    assert tournament_data.golfer_set.filter(name=my_golfer.name).exists()
+    my_golfer = Golfer.objects.get(id=7)
+    assert tournament_data[0].golfer_set.filter(name=my_golfer.name).exists()
 
 
 def test_golfer_references_tournament(golfer_data, tournament_data):
-    my_golfer = Golfer.objects.get(name="Fred Couples")
-    assert my_golfer.tournament == tournament_data
+    my_golfer = Golfer.objects.get(id=7)
+    assert my_golfer.tournament == tournament_data[0]
 
 
 def test_tournament_create(tournament_data):
     assert Tournament.objects.count() > 0
-    assert tournament_data.name == "Masters"
-    assert tournament_data.start_date == datetime.date(year=2023, month=4, day=6)
+    assert tournament_data[1].name == "Masters"
+    assert tournament_data[1].start_date == datetime.strptime("2023-04-06", "%Y-%m-%d")
 
 
 def test_tournament_filter(tournament_data):
@@ -46,16 +46,16 @@ def test_tournament_filter(tournament_data):
 
 
 def test_tournament_update(tournament_data):
-    tournament_data.name = "PGA Championship"
-    tournament_data.save()
+    tournament_data[0].name = "PGA Championship"
+    tournament_data[0].save()
 
     tournament_from_db = Tournament.objects.get(name="PGA Championship")
     assert tournament_from_db.name == "PGA Championship"
 
 
 def test_tournament_year_property(tournament_data):
-    start_date_year = tournament_data.start_date.year
-    assert tournament_data.year == start_date_year
+    start_date_year = tournament_data[0].start_date.year
+    assert tournament_data[0].year == start_date_year
 
 
 def test_tournament_champion_final(golfer_data):
@@ -106,7 +106,7 @@ def test_team_add_golfer_in_tournament_spot_available(team_data):
 def test_team_add_golfer_not_in_tournament(team_data):
     my_team = team_data[1]
     new_golfer = Golfer.objects.create(
-        name="Smiley Kaufman", tournament=Tournament.objects.create(name="US Open", id=2), id=100
+        name="Smiley Kaufman", tournament=Tournament.objects.create(name="US Open", id=100), id=100
     )
     remove_golfer = my_team.golfers.get(id=3)
 
