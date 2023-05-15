@@ -5,6 +5,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Max, Sum
 
+from mysite.users.models import User
+
 # Create your models here.
 
 
@@ -94,7 +96,7 @@ class Tournament(models.Model):
 
 
 class Team(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tournament = models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE)
     golfers = models.ManyToManyField("Golfer")
@@ -133,6 +135,51 @@ class Team(models.Model):
         if self.golfers.count() < 5:
             if new_golfer.tournament == self.tournament:
                 self.golfers.add(new_golfer)
+
+    @staticmethod
+    def get_teams_from_csv():
+        new_tournament = Tournament.objects.get(pk=2)
+        new_tournament.save()
+        with open("golf_contest/fixtures/team_data.csv") as f:
+            i = 1
+            for line in csv.DictReader(
+                f,
+                fieldnames=(
+                    "name",
+                    "participant_name",
+                    "golfer_1",
+                    "golfer_2",
+                    "golfer_3",
+                    "golfer_4",
+                    "golfer_5",
+                    "third_tie_breaker",
+                ),
+            ):
+                new_team = Team.objects.create(
+                    name=line["name"],
+                    user=User.objects.get(pk=i),
+                    tournament=new_tournament,
+                )
+                new_team.save()
+
+                print(line["golfer_1"])
+                new_golfer = Golfer.objects.get(name=line["golfer_1"], tournament=new_tournament)
+                new_team.add_golfer(new_golfer)
+                new_golfer = Golfer.objects.get(name=line["golfer_2"], tournament=new_tournament)
+                new_team.add_golfer(new_golfer)
+                new_golfer = Golfer.objects.get(name=line["golfer_3"], tournament=new_tournament)
+                new_team.add_golfer(new_golfer)
+                new_golfer = Golfer.objects.get(name=line["golfer_4"], tournament=new_tournament)
+                new_team.add_golfer(new_golfer)
+                new_golfer = Golfer.objects.get(name=line["golfer_5"], tournament=new_tournament)
+                new_team.add_golfer(new_golfer)
+
+                if i == 1:
+                    i = 2
+                elif i == 2:
+                    i = 3
+                else:
+                    i = 1
 
     def __str__(self):
         return self.name
