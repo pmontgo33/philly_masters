@@ -301,5 +301,6 @@ SOCIALACCOUNT_ADAPTER = "mysite.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "mysite.users.forms.UserSocialSignupForm"}
 
 
-# Your stuff...
+# Golf Leaderboard API - https://rapidapi.com/sportcontentapi/api/golf-leaderboard-data
 # ------------------------------------------------------------------------------
+GOLF_LEADERBOARD_API_KEY = env("GOLF_LEADERBOARD_API_KEY")

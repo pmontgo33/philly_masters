@@ -1,5 +1,6 @@
 import requests
 from celery import shared_task
+from django.conf import settings
 
 from golf_contest.models import Tournament
 
@@ -8,7 +9,7 @@ from golf_contest.models import Tournament
 def get_leaderboard():
     url = "https://golf-leaderboard-data.p.rapidapi.com/leaderboard/25"
     headers = {
-        "X-RapidAPI-Key": "9cec043c71msh1498d7b1d12c51ap12687cjsnce1852b2a557",
+        "X-RapidAPI-Key": settings.GOLF_LEADERBOARD_API_KEY,
         "X-RapidAPI-Host": "golf-leaderboard-data.p.rapidapi.com",
     }
     response = requests.get(url, headers=headers)

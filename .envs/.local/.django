@@ -12,3 +12,7 @@ REDIS_URL=redis://redis:6379/0
 # Flower
 CELERY_FLOWER_USER=AUBGuoPphRcSWQZdvodWyNRZGmzIKDQs
 CELERY_FLOWER_PASSWORD=33RpM9u6hzYGh3vaLPCYaXYHiPUEzrLOUVyJtxhIY8sCL0YNT4kRbBvHcLYe4xy6
+
+# Golf Leaderboard API - https://rapidapi.com/sportcontentapi/api/golf-leaderboard-data
+# ------------------------------------------------------------------------------
+GOLF_LEADERBOARD_API_KEY=62d49b3b77msh6ad3795bb2ca8cdp19f6ecjsn500439c086ba
