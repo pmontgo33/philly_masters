@@ -1802,6 +1802,16 @@
     }
   },
   {
+    "model": "golf_contest.tournament",
+    "pk": 3,
+    "fields": {
+      "name": "PGA Championship",
+      "start_date": "2020-08-06",
+      "state": "FNL",
+      "world_ranking_week": 0
+    }
+  },
+  {
     "model": "users.user",
     "pk": 1,
     "fields": {

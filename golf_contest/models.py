@@ -11,6 +11,7 @@ from mysite.users.models import User
 
 
 class Golfer(models.Model):
+    player_id = models.IntegerField()
     name = models.CharField(max_length=40)
     tournament_position = models.CharField(null=True, blank=True, max_length=4)
     score_to_par = models.SmallIntegerField(null=True, blank=True, default=None)
@@ -27,6 +28,9 @@ class Golfer(models.Model):
     rd_four_strokes = models.SmallIntegerField(null=True, blank=True, default=None)
 
     # TODO Add @property for applicable world ranking
+
+    class Meta:
+        unique_together = ("player_id", "tournament")
 
     def __str__(self):
         return self.name
@@ -56,6 +60,9 @@ class Tournament(models.Model):
             return self.golfer_set.get(tournament_position=1)
         else:
             return None
+
+    def add_golfer(self, player_id, name):
+        Golfer.objects.create(player_id=player_id, name=name, tournament=self)
 
     @staticmethod
     def get_tournament_from_csv():

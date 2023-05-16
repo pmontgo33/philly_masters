@@ -9,6 +9,12 @@ docker compose -f local.yml up
 # MAKEMIGRATIONS
 docker compose -f local.yml run --rm django python manage.py makemigrations
 
+# SHELL
+docker compose -f local.yml run --rm django python manage.py shell
+
+# DUMPDATA
+docker compose -f local.yml run --rm django python manage.py dumpdata myapp.model --indent 2 > file.json
+
 # PYTEST
 docker compose -f local.yml run --rm django pytest
 
