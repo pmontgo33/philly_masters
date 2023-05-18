@@ -1,0 +1,81 @@
+{% extends "golf_contest/base.html" %} {% block content %}
+
+<h2>{{tournament}} - Leaderboard</h2>
+
+<table id="leaderboardTable" class="display" style="width: 100%">
+  <thead>
+    <tr>
+      <th></th>
+      <th class="text-center">POS</th>
+      <th>Player</th>
+      <th>Total</th>
+      <th>R1</th>
+      <th>R2</th>
+      <th>R3</th>
+      <th>R4</th>
+      <th>Strokes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for golfer in golfers %}
+    <tr
+      class="table-row"
+      data-child-value="
+      HI"
+    >
+      <td class="details-control"></td>
+      <td class="text-center">{{ golfer.position_with_ties }}</td>
+      <td>{{ golfer.name }}</td>
+      <td>{{ golfer.score_to_par }}</td>
+      <td>{{ golfer.rd_one_strokes }}</td>
+      <td>{{ golfer.rd_two_strokes }}</td>
+      <td>{{ golfer.rd_three_strokes }}</td>
+      <td>{{ golfer.rd_four_strokes }}</td>
+      <td>{{ golfer.total_strokes }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th></th>
+      <th class="text-center">POS</th>
+      <th>Player</th>
+      <th>Total</th>
+      <th>R1</th>
+      <th>R2</th>
+      <th>R3</th>
+      <th>R4</th>
+      <th>Strokes</th>
+    </tr>
+  </tfoot>
+</table>
+
+{% endblock %} {% block script %}
+
+<script>
+  function format(value) {
+    return '<tr class="table-row"><td>Golfers:</td><td>' + value + '</td></tr>';
+  }
+  $(document).ready(function () {
+    var table = $('#leaderboardTable').DataTable({
+      order: [[3, 'asc']],
+      paging: false,
+    });
+
+    $('#leaderboardTable').on('click', 'td.details-control', function () {
+      var tr = $(this).closest('tr');
+      var row = table.row(tr);
+
+      if (row.child.isShown()) {
+        // This row is already open - close it
+        row.child.hide();
+        tr.removeClass('shown');
+      } else {
+        // Open this row
+        row.child(format(tr.data('child-value'))).show();
+        tr.addClass('shown');
+      }
+    });
+  });
+</script>
+{% endblock %}

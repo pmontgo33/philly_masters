@@ -14,23 +14,46 @@ class Golfer(models.Model):
     player_id = models.IntegerField()
     name = models.CharField(max_length=40)
     tournament_position = models.CharField(null=True, blank=True, max_length=4)
+    tournament_position_tied = models.BooleanField(default=False)
     score_to_par = models.SmallIntegerField(null=True, blank=True, default=None)
     tournament = models.ForeignKey("Tournament", on_delete=models.CASCADE)
 
     # Rounds
     rd_one_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_one_strokes = models.SmallIntegerField(null=True, blank=True, default=None)
+    rd_one_strokes = models.SmallIntegerField(null=True, blank=True, default=0)
     rd_two_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_two_strokes = models.SmallIntegerField(null=True, blank=True, default=None)
+    rd_two_strokes = models.SmallIntegerField(null=True, blank=True, default=0)
     rd_three_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_three_strokes = models.SmallIntegerField(null=True, blank=True, default=None)
+    rd_three_strokes = models.SmallIntegerField(null=True, blank=True, default=0)
     rd_four_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_four_strokes = models.SmallIntegerField(null=True, blank=True, default=None)
+    rd_four_strokes = models.SmallIntegerField(null=True, blank=True, default=0)
 
     # TODO Add @property for applicable world ranking
 
     class Meta:
         unique_together = ("player_id", "tournament")
+
+    @property
+    def total_strokes(self):
+        return self.rd_one_strokes + self.rd_two_strokes + self.rd_three_strokes + self.rd_four_strokes
+
+    @property
+    def position_with_ties(self):
+        if self.tournament_position_tied:
+            return "T" + str(self.tournament_position)
+        else:
+            return str(self.tournament_position)
+
+    def check_tied(self):
+        all_golfers_in_tournament = self.tournament.golfer_set.all()
+        all_golfers_in_tournament = sorted(all_golfers_in_tournament, key=lambda x: x.score_to_par)
+        if sum(golfer.score_to_par == self.score_to_par for golfer in all_golfers_in_tournament) > 1:
+            for i, dic in enumerate(all_golfers_in_tournament):
+                if dic.score_to_par == self.score_to_par:
+                    self.tournament_position_tied = True
+                    break
+        else:
+            self.tournament_position_tied = False
 
     def __str__(self):
         return self.name
@@ -118,6 +141,13 @@ class Team(models.Model):
     def score(self):
         return self.raw_score + self.bonuses
 
+    @property
+    def place_with_ties(self):
+        if self.place_tied:
+            return "T" + str(self.place)
+        else:
+            return str(self.place)
+
     def calculate_place(self):
         all_teams_in_tournament = self.tournament.team_set.all()
         all_teams_in_tournament = sorted(all_teams_in_tournament, key=lambda x: x.score)
@@ -126,6 +156,7 @@ class Team(models.Model):
                 if dic.score == self.score:
                     self.place = i + 1
                     self.place_tied = True
+                    break
         else:
             self.place = all_teams_in_tournament.index(self) + 1
             self.place_tied = False

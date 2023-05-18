@@ -41,6 +41,18 @@ def update_leaderboard_golfers(tournament_pk):
         name = golfer["first_name"] + " " + golfer["last_name"]
         tournament.add_golfer(player_id=player_id, name=name)
 
+    for golfer in tournament.golfer_set.all():
+        # check if the golfer is in the
+        if (
+            next(
+                (item for item in response.json()["results"]["leaderboard"] if item["player_id"] == golfer.player_id),
+                None,
+            )
+            is None
+        ):
+            print(golfer.name)
+            golfer.delete()
+
 
 @shared_task
 def update_leaderboard_scores(tournament_pk):
@@ -80,10 +92,14 @@ def update_leaderboard_scores(tournament_pk):
 
         golfer.save()
 
+    for golfer in tournament.golfer_set.all():
+        golfer.check_tied()
+        golfer.save(update_fields=["tournament_position_tied"])
+
     for team in tournament.team_set.all():
         team.calculate_raw_score()
         team.save(update_fields=["raw_score"])
 
     for team in tournament.team_set.all():
         team.calculate_place()
-        team.save(update_fields=["place"])
+        team.save(update_fields=["place", "place_tied"])
