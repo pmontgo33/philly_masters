@@ -46,6 +46,7 @@ class Tournament(models.Model):
         ("FNL", "FINAL"),
     ]
     name = models.CharField(max_length=200)
+    tournament_id = models.IntegerField()
     start_date = models.DateField(default=datetime.date.today)
     state = models.CharField(choices=STATE_CHOICES, max_length=3, default="NST")
     world_ranking_week = models.SmallIntegerField(default=0)
@@ -62,7 +63,7 @@ class Tournament(models.Model):
             return None
 
     def add_golfer(self, player_id, name):
-        Golfer.objects.create(player_id=player_id, name=name, tournament=self)
+        Golfer.objects.update_or_create(player_id=player_id, tournament=self, defaults={"name": name})
 
     @staticmethod
     def get_tournament_from_csv():
@@ -108,35 +109,34 @@ class Team(models.Model):
     tournament = models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE)
     golfers = models.ManyToManyField("Golfer")
 
-    @property
-    def raw_score(self):
-        if self.golfers.count() > 0:
-            all_golfers_score = self.golfers.all().aggregate(Sum("score_to_par"))["score_to_par__sum"]
-            worst_golfer_score = self.golfers.all().aggregate(Max("score_to_par"))["score_to_par__max"]
-            return all_golfers_score - worst_golfer_score
-        else:
-            return 0
-
-    @property
-    def bonuses(self):
-        return 0
+    raw_score = models.SmallIntegerField(default=0)
+    bonuses = models.SmallIntegerField(default=0)
+    place = models.PositiveSmallIntegerField(null=True, blank=True, default=None)
+    place_tied = models.BooleanField(default=False)
 
     @property
     def score(self):
         return self.raw_score + self.bonuses
 
-    @property
-    def place(self):
-        # Potential efficiency would be to only calculate this when the updated
-        # Tournament leaderboard is pulled in, rather than at each request
+    def calculate_place(self):
         all_teams_in_tournament = self.tournament.team_set.all()
         all_teams_in_tournament = sorted(all_teams_in_tournament, key=lambda x: x.score)
         if sum(team.score == self.score for team in all_teams_in_tournament) > 1:
             for i, dic in enumerate(all_teams_in_tournament):
                 if dic.score == self.score:
-                    return "T" + str(i + 1)
+                    self.place = i + 1
+                    self.place_tied = True
         else:
-            return all_teams_in_tournament.index(self) + 1
+            self.place = all_teams_in_tournament.index(self) + 1
+            self.place_tied = False
+
+    def calculate_raw_score(self):
+        if self.golfers.count() > 0:
+            all_golfers_score = self.golfers.all().aggregate(Sum("score_to_par"))["score_to_par__sum"]
+            worst_golfer_score = self.golfers.all().aggregate(Max("score_to_par"))["score_to_par__max"]
+            self.raw_score = all_golfers_score - worst_golfer_score
+        else:
+            self.raw_score = 0
 
     def add_golfer(self, new_golfer):
         if self.golfers.count() < 5:

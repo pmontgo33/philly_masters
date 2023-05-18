@@ -9,8 +9,6 @@ def index(request):
 
 def standings(request, pk):
     tournament = Tournament.objects.get(pk=pk)
-    print(tournament)
     teams = tournament.team_set.all()
-    print(teams)
 
     return render(request, "golf_contest/standings.html", {"tournament": tournament, "teams": teams})
