@@ -6,6 +6,7 @@
   <thead>
     <tr>
       <th></th>
+      <th>POS NO TIES</th>
       <th class="text-center">POS</th>
       <th>Player</th>
       <th>Total</th>
@@ -24,6 +25,7 @@
       HI"
     >
       <td class="details-control"></td>
+      <td>{{ golfer.tournament_position }}</td>
       <td class="text-center">{{ golfer.position_with_ties }}</td>
       <td>{{ golfer.name }}</td>
       <td>{{ golfer.score_to_par }}</td>
@@ -38,6 +40,7 @@
   <tfoot>
     <tr>
       <th></th>
+      <th>POS NO TIES</th>
       <th class="text-center">POS</th>
       <th>Player</th>
       <th>Total</th>
@@ -58,8 +61,9 @@
   }
   $(document).ready(function () {
     var table = $('#leaderboardTable').DataTable({
-      order: [[3, 'asc']],
+      order: [[1, 'asc']],
       paging: false,
+      columnDefs: [{ visible: false, targets: [1] }],
     });
 
     $('#leaderboardTable').on('click', 'td.details-control', function () {

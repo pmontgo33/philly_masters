@@ -46,11 +46,11 @@ def test_tournament_filter(tournament_data):
 
 
 def test_tournament_update(tournament_data):
-    tournament_data[0].name = "PGA Championship"
+    tournament_data[0].name = "Pat's Tournament"
     tournament_data[0].save()
 
-    tournament_from_db = Tournament.objects.get(name="PGA Championship")
-    assert tournament_from_db.name == "PGA Championship"
+    tournament_from_db = Tournament.objects.get(name="Pat's Tournament")
+    assert tournament_from_db.name == "Pat's Tournament"
 
 
 def test_tournament_year_property(tournament_data):
@@ -86,7 +86,7 @@ def test_team_update(team_data):
 
 def test_team_add_too_many_golfers(team_data):
     my_team = team_data[1]
-    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=my_team.tournament, id=100)
+    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=my_team.tournament, player_id=-100, id=100)
 
     my_team.add_golfer(new_golfer)
     assert new_golfer not in my_team.golfers.all()
@@ -94,7 +94,9 @@ def test_team_add_too_many_golfers(team_data):
 
 def test_team_add_golfer_in_tournament_spot_available(team_data):
     my_team = team_data[1]
-    new_golfer = Golfer.objects.create(name="Smiley Kaufman", tournament=Tournament.objects.get(id=1), id=100)
+    new_golfer = Golfer.objects.create(
+        name="Smiley Kaufman", tournament=Tournament.objects.get(id=1), player_id=-100, id=100
+    )
     remove_golfer = my_team.golfers.get(id=3)
 
     my_team.golfers.remove(remove_golfer)
@@ -106,7 +108,10 @@ def test_team_add_golfer_in_tournament_spot_available(team_data):
 def test_team_add_golfer_not_in_tournament(team_data):
     my_team = team_data[1]
     new_golfer = Golfer.objects.create(
-        name="Smiley Kaufman", tournament=Tournament.objects.create(name="US Open", id=100), id=100
+        name="Smiley Kaufman",
+        tournament=Tournament.objects.create(name="US Open", tournament_id=-100, id=100),
+        player_id=-100,
+        id=100,
     )
     remove_golfer = my_team.golfers.get(id=3)
 
@@ -118,9 +123,11 @@ def test_team_add_golfer_not_in_tournament(team_data):
 
 def test_team_raw_score(team_data):
     my_team = team_data[1]
+    my_team.calculate_raw_score()
     assert my_team.raw_score == -28
 
 
 def test_team_score(team_data):
     my_team = team_data[1]
+    my_team.calculate_raw_score()
     assert my_team.score == -28

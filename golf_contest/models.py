@@ -32,6 +32,7 @@ class Golfer(models.Model):
 
     class Meta:
         unique_together = ("player_id", "tournament")
+        ordering = ["name"]
 
     @property
     def total_strokes(self):

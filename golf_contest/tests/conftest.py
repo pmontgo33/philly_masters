@@ -23,6 +23,7 @@ def tournament_data(db, load_fixture_files):
         all_tournaments.append(
             Tournament.objects.create(
                 name=tournament["fields"]["name"],
+                tournament_id=tournament["fields"]["tournament_id"],
                 start_date=datetime.strptime(tournament["fields"]["start_date"], "%Y-%m-%d"),
                 state=tournament["fields"]["state"],
                 world_ranking_week=tournament["fields"]["world_ranking_week"],
@@ -41,6 +42,7 @@ def golfer_data(db, load_fixture_files, tournament_data):
         all_golfers.append(
             Golfer.objects.create(
                 name=golfer["fields"]["name"],
+                player_id=golfer["fields"]["player_id"],
                 tournament_position=golfer["fields"]["tournament_position"],
                 score_to_par=golfer["fields"]["score_to_par"],
                 tournament=Tournament.objects.get(id=golfer["fields"]["tournament"]),
