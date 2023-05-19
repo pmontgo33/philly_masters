@@ -4,6 +4,35 @@ from .models import Team
 
 
 class TeamForm(forms.ModelForm):
+    golfer_1 = forms.ModelChoiceField(queryset=None)
+    golfer_2 = forms.ModelChoiceField(queryset=None)
+    golfer_3 = forms.ModelChoiceField(queryset=None)
+    golfer_4 = forms.ModelChoiceField(queryset=None)
+    golfer_5 = forms.ModelChoiceField(queryset=None)
+
     class Meta:
         model = Team
-        fields = ("name", "user", "tournament", "golfers")
+        fields = ("tournament", "name", "user")
+        # widgets = {
+        #     'golfers': forms.CheckboxSelectMultiple(attrs={"size": "5"})
+        # }
+
+    def __init__(self, *args, **kwargs):
+        queryset = kwargs.pop("queryset", None)
+        super().__init__(*args, **kwargs)
+
+        self.fields["tournament"].disabled = True
+        self.fields["golfer_1"].label = "Golfer 1"
+        self.fields["golfer_1"].queryset = queryset
+        self.fields["golfer_2"].label = "Golfer 2"
+        self.fields["golfer_2"].queryset = queryset
+        self.fields["golfer_3"].label = "Golfer 3"
+        self.fields["golfer_3"].queryset = queryset
+        self.fields["golfer_4"].label = "Golfer 4"
+        self.fields["golfer_4"].queryset = queryset
+        self.fields["golfer_5"].label = "Golfer 5"
+        self.fields["golfer_5"].queryset = queryset
+
+        # self.fields['golfers'].queryset = queryset
+        # self.fields['golfers'].widget = forms.SelectMultiple(attrs={'size': 5})
+        # self.fields['golfers'].widget.option_template_name = 'golfer_contest/golfer_option_template.html'
