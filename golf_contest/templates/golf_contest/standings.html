@@ -9,9 +9,9 @@
       <th>Place</th>
       <th>Name</th>
       <th>Participant</th>
-      <th>Raw Score</th>
-      <th>Bonuses</th>
-      <th>Team Score</th>
+      <th class="text-center">Raw Score</th>
+      <th class="text-center">>Bonuses</th>
+      <th class="text-center">Team Score</th>
     </tr>
   </thead>
   <tbody>
@@ -24,12 +24,12 @@
       {% endfor %}"
     >
       <td class="details-control"></td>
-      <td>{{ team.place_with_ties }}</td>
+      <td class="text-center">{{ team.place_with_ties }}</td>
       <td>{{ team.name }}</td>
       <td>{{ team.user.email }}</td>
-      <td>{{ team.raw_score }}</td>
-      <td>{{ team.bonuses }}</td>
-      <td>{{ team.score }}</td>
+      <td class="text-center">{{ team.raw_score }}</td>
+      <td class="text-center">{{ team.bonuses }}</td>
+      <td class="text-center">{{ team.score }}</td>
     </tr>
     {% endfor %}
   </tbody>
@@ -39,9 +39,9 @@
       <th>Place</th>
       <th>Name</th>
       <th>Participant</th>
-      <th>Raw Score</th>
-      <th>Bonuses</th>
-      <th>Team Score</th>
+      <th class="text-center">Raw Score</th>
+      <th class="text-center">Bonuses</th>
+      <th class="text-center">Team Score</th>
     </tr>
   </tfoot>
 </table>

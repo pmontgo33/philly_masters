@@ -65,6 +65,19 @@ class Golfer(models.Model):
         else:
             self.tournament_position_tied = False
 
+    def save(self, *args, **kwargs):
+        current_round = self.tournament.current_round
+        if current_round == 1:
+            self.score_today = self.rd_one_score_to_par
+        elif current_round == 2:
+            self.score_today = self.rd_two_score_to_par
+        elif current_round == 3:
+            self.score_today = self.rd_three_score_to_par
+        elif current_round == 4:
+            self.score_today = self.rd_four_score_to_par
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 

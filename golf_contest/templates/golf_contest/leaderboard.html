@@ -9,12 +9,14 @@
       <th>POS NO TIES</th>
       <th class="text-center">POS</th>
       <th>Player</th>
-      <th>Total</th>
-      <th>R1</th>
-      <th>R2</th>
-      <th>R3</th>
-      <th>R4</th>
-      <th>Strokes</th>
+      <th class="text-center">Total</th>
+      <th class="text-center">Today</th>
+      <th class="text-center">Thru</th>
+      <th class="text-center">R1</th>
+      <th class="text-center">R2</th>
+      <th class="text-center">R3</th>
+      <th class="text-center">R4</th>
+      <th class="text-center">Strokes</th>
     </tr>
   </thead>
   <tbody>
@@ -28,12 +30,30 @@
       <td>{{ golfer.tournament_position }}</td>
       <td class="text-center">{{ golfer.position_with_ties }}</td>
       <td>{{ golfer.name }}</td>
-      <td>{{ golfer.score_to_par }}</td>
-      <td>{{ golfer.rd_one_strokes }}</td>
-      <td>{{ golfer.rd_two_strokes }}</td>
-      <td>{{ golfer.rd_three_strokes }}</td>
-      <td>{{ golfer.rd_four_strokes }}</td>
-      <td>{{ golfer.total_strokes }}</td>
+      <td class="text-center">{{ golfer.score_to_par }}</td>
+      <td class="text-center">{{ golfer.score_today }}</td>
+      <td class="text-center">
+        {% if golfer.thru == 18 %} F {% elif golfer.thru == 0 %} {% if
+        tournament.status == "endofday" %} F {% endif %} {% else %} {{
+        golfer.thru }} {% endif %}
+      </td>
+      <td class="text-center">
+        {% if golfer.rd_one_strokes == 0 %} - {% else %} {{
+        golfer.rd_one_strokes }} {% endif %}
+      </td>
+      <td class="text-center">
+        {% if golfer.rd_two_strokes == 0 %} - {% else %} {{
+        golfer.rd_two_strokes }} {% endif %}
+      </td>
+      <td class="text-center">
+        {% if golfer.rd_three_strokes == 0 %} - {% else %} {{
+        golfer.rd_three_strokes }} {% endif %}
+      </td>
+      <td class="text-center">
+        {% if golfer.rd_four_strokes == 0 %} - {% else %} {{
+        golfer.rd_four_strokes }} {% endif %}
+      </td>
+      <td class="text-center">{{ golfer.total_strokes }}</td>
     </tr>
     {% endfor %}
   </tbody>
@@ -43,12 +63,14 @@
       <th>POS NO TIES</th>
       <th class="text-center">POS</th>
       <th>Player</th>
-      <th>Total</th>
-      <th>R1</th>
-      <th>R2</th>
-      <th>R3</th>
-      <th>R4</th>
-      <th>Strokes</th>
+      <th class="text-center">Total</th>
+      <th class="text-center">Today</th>
+      <th class="text-center">Thru</th>
+      <th class="text-center">R1</th>
+      <th class="text-center">R2</th>
+      <th class="text-center">R3</th>
+      <th class="text-center">R4</th>
+      <th class="text-center">Strokes</th>
     </tr>
   </tfoot>
 </table>
