@@ -1,3 +1,5 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 from django import forms
 
 from .models import Team
@@ -13,9 +15,6 @@ class TeamForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ("tournament", "name", "user")
-        # widgets = {
-        #     'golfers': forms.CheckboxSelectMultiple(attrs={"size": "5"})
-        # }
 
     def __init__(self, *args, **kwargs):
         queryset = kwargs.pop("queryset", None)
@@ -33,6 +32,10 @@ class TeamForm(forms.ModelForm):
         self.fields["golfer_5"].label = "Golfer 5"
         self.fields["golfer_5"].queryset = queryset
 
-        # self.fields['golfers'].queryset = queryset
-        # self.fields['golfers'].widget = forms.SelectMultiple(attrs={'size': 5})
-        # self.fields['golfers'].widget.option_template_name = 'golfer_contest/golfer_option_template.html'
+        self.helper = FormHelper()
+        self.helper.form_id = "id-exampleForm"
+        self.helper.form_class = "blueForms"
+        self.helper.form_method = "post"
+        # self.helper.form_action = 'submit_survey'
+
+        self.helper.add_input(Submit("submit", "Submit"))

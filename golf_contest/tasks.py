@@ -65,30 +65,39 @@ def update_leaderboard_scores(tournament_pk):
     }
     response = requests.get(url, headers=headers)
 
+    tournament.status = response.json()["results"]["tournament"]["live_details"]["status"]
+    tournament.current_round = response.json()["results"]["tournament"]["live_details"]["current_round"]
+    tournament.save(update_fields=["status", "current_round"])
+
     for golfer_data in response.json()["results"]["leaderboard"]:
         golfer = Golfer.objects.get(tournament=tournament, player_id=golfer_data["player_id"])
         golfer.tournament_position = golfer_data["position"]
         golfer.score_to_par = golfer_data["total_to_par"]
+        golfer.thru = golfer_data["holes_played"]
 
         round = next(r for r in golfer_data["rounds"] if r["round_number"] == 1)
         if round["tee_time_local"] is not None:
             golfer.rd_one_tee_time = datetime.strptime(round["tee_time_local"], "%H:%M")
         golfer.rd_one_strokes = round["strokes"]
+        golfer.rd_one_score_to_par = round["total_to_par"]
 
         round = next(r for r in golfer_data["rounds"] if r["round_number"] == 2)
         if round["tee_time_local"] is not None:
             golfer.rd_two_tee_time = datetime.strptime(round["tee_time_local"], "%H:%M")
         golfer.rd_two_strokes = round["strokes"]
+        golfer.rd_two_score_to_par = round["total_to_par"]
 
         round = next(r for r in golfer_data["rounds"] if r["round_number"] == 3)
         if round["tee_time_local"] is not None:
             golfer.rd_three_tee_time = datetime.strptime(round["tee_time_local"], "%H:%M")
         golfer.rd_three_strokes = round["strokes"]
+        golfer.rd_three_score_to_par = round["total_to_par"]
 
         round = next(r for r in golfer_data["rounds"] if r["round_number"] == 4)
         if round["tee_time_local"] is not None:
             golfer.rd_four_tee_time = datetime.strptime(round["tee_time_local"], "%H:%M")
         golfer.rd_four_strokes = round["strokes"]
+        golfer.rd_four_score_to_par = round["total_to_par"]
 
         golfer.save()
 

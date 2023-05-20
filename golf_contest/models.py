@@ -13,20 +13,29 @@ from mysite.users.models import User
 class Golfer(models.Model):
     player_id = models.IntegerField()
     name = models.CharField(max_length=40)
+    tournament = models.ForeignKey("Tournament", on_delete=models.CASCADE)
     tournament_position = models.CharField(null=True, blank=True, max_length=4)
     tournament_position_tied = models.BooleanField(default=False)
     score_to_par = models.SmallIntegerField(null=True, blank=True, default=None)
-    tournament = models.ForeignKey("Tournament", on_delete=models.CASCADE)
+    thru = models.PositiveSmallIntegerField(null=True, blank=True, default=None)
+    score_today = models.SmallIntegerField(null=True, blank=True, default=None)
 
     # Rounds
     rd_one_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_one_strokes = models.SmallIntegerField(null=True, blank=True, default=0)
+    rd_one_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
+    rd_one_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
+
     rd_two_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_two_strokes = models.SmallIntegerField(null=True, blank=True, default=0)
+    rd_two_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
+    rd_two_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
+
     rd_three_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_three_strokes = models.SmallIntegerField(null=True, blank=True, default=0)
+    rd_three_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
+    rd_three_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
+
     rd_four_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_four_strokes = models.SmallIntegerField(null=True, blank=True, default=0)
+    rd_four_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
+    rd_four_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
 
     # TODO Add @property for applicable world ranking
 
@@ -61,18 +70,11 @@ class Golfer(models.Model):
 
 
 class Tournament(models.Model):
-    STATE_CHOICES = [
-        ("NST", "Not Started"),
-        ("RD1", "Round 1"),
-        ("RD2", "Round 2"),
-        ("RD3", "Round 3"),
-        ("RD4", "Round 4"),
-        ("FNL", "FINAL"),
-    ]
     name = models.CharField(max_length=200)
     tournament_id = models.IntegerField()
     start_date = models.DateField(default=datetime.date.today)
-    state = models.CharField(choices=STATE_CHOICES, max_length=3, default="NST")
+    status = models.CharField(max_length=15, default="pre")
+    current_round = models.PositiveSmallIntegerField(default=0)
     world_ranking_week = models.SmallIntegerField(default=0)
 
     @property
