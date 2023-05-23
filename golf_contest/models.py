@@ -23,10 +23,10 @@ class Golfer(models.Model):
     # Rounds
     rounds = models.JSONField(
         default={
-            "r1": {"tee_time": "", "strokes": "", "score_to_par": ""},
-            "r2": {"tee_time": "", "strokes": "", "score_to_par": ""},
-            "r3": {"tee_time": "", "strokes": "", "score_to_par": ""},
-            "r4": {"tee_time": "", "strokes": "", "score_to_par": ""},
+            "r1": {"tee_time": "", "strokes": "", "score_to_par": None},
+            "r2": {"tee_time": "", "strokes": "", "score_to_par": None},
+            "r3": {"tee_time": "", "strokes": "", "score_to_par": None},
+            "r4": {"tee_time": "", "strokes": "", "score_to_par": None},
         }
     )
     # rd_one_tee_time = models.TimeField(null=True, blank=True, default=None)
@@ -115,7 +115,7 @@ class Tournament(models.Model):
 
     @property
     def champion(self):
-        if self.state == "FNL":
+        if self.status == "completed":
             return self.golfer_set.get(tournament_position=1)
         else:
             return None

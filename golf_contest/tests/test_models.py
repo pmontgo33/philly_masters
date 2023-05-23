@@ -22,7 +22,7 @@ def test_golfer_update(golfer_data):
 
 def test_golfer_tee_time_blank(golfer_data):
     my_golfer = Golfer.objects.get(id=7)
-    assert my_golfer.rd_one_tee_time is None
+    assert my_golfer.rounds["r1"]["tee_time"] == ""
 
 
 def test_tournament_contains_golfer(golfer_data, tournament_data):
@@ -67,7 +67,7 @@ def test_tournament_champion_final(golfer_data):
 
 def test_tournament_champion_not_final(golfer_data):
     tournament = golfer_data[0].tournament
-    tournament.state = "RD1"
+    tournament.status = "endofday"
 
     assert tournament.champion is None
 
@@ -109,7 +109,7 @@ def test_team_add_golfer_not_in_tournament(team_data):
     my_team = team_data[1]
     new_golfer = Golfer.objects.create(
         name="Smiley Kaufman",
-        tournament=Tournament.objects.create(name="US Open", tournament_id=-100, id=100),
+        tournament=Tournament.objects.create(name="US Open", tournament_id=-100, id=100, current_round=1),
         player_id=-100,
         id=100,
     )

@@ -5104,9 +5104,10 @@
     "pk": 1,
     "fields": {
       "name": "Masters",
-      "tournament_id": -1,
+      "tournament_id": 0,
       "start_date": "1997-04-10",
-      "state": "FNL",
+      "status": "completed",
+      "current_round": 4,
       "world_ranking_week": 0
     }
   },
@@ -5117,7 +5118,8 @@
       "name": "Masters",
       "tournament_id": 501,
       "start_date": "2023-04-06",
-      "state": "FNL",
+      "status": "pre",
+      "current_round": 1,
       "world_ranking_week": 11
     }
   },
@@ -5128,7 +5130,8 @@
       "name": "PGA Championship",
       "tournament_id": 507,
       "start_date": "2023-05-18",
-      "state": "NST",
+      "status": "completed",
+      "current_round": 4,
       "world_ranking_week": 0
     }
   },

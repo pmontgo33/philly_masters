@@ -44,4 +44,4 @@ class TeamForm(forms.ModelForm):
 class TournamentForm(forms.ModelForm):
     class Meta:
         model = Tournament
-        fields = "tournament_id"
+        fields = ("tournament_id",)

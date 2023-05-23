@@ -1,0 +1,38 @@
+[
+  {
+    "model": "golf_contest.tournament",
+    "pk": 1,
+    "fields": {
+      "name": "Masters",
+      "tournament_id": 0,
+      "start_date": "1997-04-10",
+      "status": "pre",
+      "current_round": 0,
+      "world_ranking_week": 0
+    }
+  },
+  {
+    "model": "golf_contest.tournament",
+    "pk": 2,
+    "fields": {
+      "name": "Masters",
+      "tournament_id": 501,
+      "start_date": "2023-04-06",
+      "status": "pre",
+      "current_round": 0,
+      "world_ranking_week": 11
+    }
+  },
+  {
+    "model": "golf_contest.tournament",
+    "pk": 3,
+    "fields": {
+      "name": "PGA Championship",
+      "tournament_id": 507,
+      "start_date": "2023-05-18",
+      "status": "completed",
+      "current_round": 4,
+      "world_ranking_week": 0
+    }
+  }
+]

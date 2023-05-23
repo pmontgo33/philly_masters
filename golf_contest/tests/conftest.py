@@ -25,8 +25,9 @@ def tournament_data(db, load_fixture_files):
                 name=tournament["fields"]["name"],
                 tournament_id=tournament["fields"]["tournament_id"],
                 start_date=datetime.strptime(tournament["fields"]["start_date"], "%Y-%m-%d"),
-                state=tournament["fields"]["state"],
+                status=tournament["fields"]["status"],
                 world_ranking_week=tournament["fields"]["world_ranking_week"],
+                current_round=tournament["fields"]["current_round"],
                 id=tournament["pk"],
             )
         )
