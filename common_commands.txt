@@ -7,7 +7,7 @@ docker compose -f local.yml build
 docker compose -f local.yml up
 
 # MAKEMIGRATIONS
-    docker compose -f local.yml run --rm django python manage.py makemigrations
+docker compose -f local.yml run --rm django python manage.py makemigrations
 
 # SHELL
 docker compose -f local.yml run --rm django python manage.py shell

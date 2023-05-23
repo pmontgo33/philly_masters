@@ -1,106 +1,105 @@
-{% extends "golf_contest/base.html" %} {% block content %}
+{% extends "golf_contest/base.html" %}
 
-<h2>{{tournament}} - Leaderboard</h2>
+{% block content %}
+<h2>Leaderboard - {{tournament}}</h2>
 
-<table id="leaderboardTable" class="display" style="width: 100%">
-  <thead>
-    <tr>
-      <th></th>
-      <th>POS NO TIES</th>
-      <th class="text-center">POS</th>
-      <th>Player</th>
-      <th class="text-center">Total</th>
-      <th class="text-center">Today</th>
-      <th class="text-center">Thru</th>
-      <th class="text-center">R1</th>
-      <th class="text-center">R2</th>
-      <th class="text-center">R3</th>
-      <th class="text-center">R4</th>
-      <th class="text-center">Strokes</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for golfer in golfers %}
-    <tr
-      class="table-row"
-      data-child-value="
-      HI"
-    >
-      <td class="details-control"></td>
-      <td>{{ golfer.tournament_position }}</td>
-      <td class="text-center">{{ golfer.position_with_ties }}</td>
-      <td>{{ golfer.name }}</td>
-      <td class="text-center">{{ golfer.score_to_par }}</td>
-      <td class="text-center">{{ golfer.score_today }}</td>
-      <td class="text-center">
-        {% if golfer.thru == 18 %} F {% elif golfer.thru == 0 %} {% if
-        tournament.status == "endofday" %} F {% endif %} {% else %} {{
-        golfer.thru }} {% endif %}
-      </td>
-      <td class="text-center">
-        {% if golfer.rd_one_strokes == 0 %} - {% else %} {{
-        golfer.rd_one_strokes }} {% endif %}
-      </td>
-      <td class="text-center">
-        {% if golfer.rd_two_strokes == 0 %} - {% else %} {{
-        golfer.rd_two_strokes }} {% endif %}
-      </td>
-      <td class="text-center">
-        {% if golfer.rd_three_strokes == 0 %} - {% else %} {{
-        golfer.rd_three_strokes }} {% endif %}
-      </td>
-      <td class="text-center">
-        {% if golfer.rd_four_strokes == 0 %} - {% else %} {{
-        golfer.rd_four_strokes }} {% endif %}
-      </td>
-      <td class="text-center">{{ golfer.total_strokes }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <th></th>
-      <th>POS NO TIES</th>
-      <th class="text-center">POS</th>
-      <th>Player</th>
-      <th class="text-center">Total</th>
-      <th class="text-center">Today</th>
-      <th class="text-center">Thru</th>
-      <th class="text-center">R1</th>
-      <th class="text-center">R2</th>
-      <th class="text-center">R3</th>
-      <th class="text-center">R4</th>
-      <th class="text-center">Strokes</th>
-    </tr>
-  </tfoot>
-</table>
+<div class="container" style="width: 80%">
+  <table id="leaderboardTable" class="display" style="width: 100%">
+    <thead>
+      <tr>
+        <th>POS NO TIES</th>
+        <th class="text-center">POS</th>
+        <th>Player</th>
+        <th class="text-center">Total</th>
+        <th class="text-center">Today</th>
+        <th class="text-center">Thru</th>
+        <th class="text-center">R1</th>
+        <th class="text-center">R2</th>
+        <th class="text-center">R3</th>
+        <th class="text-center">R4</th>
+        <th class="text-center">Strokes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for golfer in golfers %}
+      <tr class="table-row" data-child-value="HI">
+        <td>{{ golfer.tournament_position }}</td>
+        <td class="text-center">{{ golfer.position_with_ties }}</td>
+        <td>{{ golfer.name }}</td>
+        <td class="text-center">
+          <strong>{{ golfer.score_to_par_formatted }}</strong>
+        </td>
+        <td class="text-center">{{ golfer.score_today }}</td>
+        <td class="text-center">{{ golfer.thru }}</td>
+        <td class="text-center">
+          {% if golfer.rounds.r1.strokes == 0 %}
+            -
+          {% else %}
+            {{ golfer.rounds.r1.strokes }}
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if golfer.rounds.r2.strokes == 0 %}
+            -
+          {% else %}
+            {{ golfer.rounds.r2.strokes }}
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if golfer.rounds.r3.strokes == 0 %}
+            -
+          {% else %}
+            {{ golfer.rounds.r3.strokes }}
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if golfer.rounds.r4.strokes == 0 %}
+            -
+          {% else %}
+            {{ golfer.rounds.r4.strokes }}
+          {% endif %}
+        </td>
+        <td class="text-center">{{ golfer.total_strokes }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th>POS NO TIES</th>
+        <th class="text-center">POS</th>
+        <th>Player</th>
+        <th class="text-center">Total</th>
+        <th class="text-center">Today</th>
+        <th class="text-center">Thru</th>
+        <th class="text-center">R1</th>
+        <th class="text-center">R2</th>
+        <th class="text-center">R3</th>
+        <th class="text-center">R4</th>
+        <th class="text-center">Strokes</th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% endblock %}
 
-{% endblock %} {% block script %}
-
+{% block script %}
 <script>
   function format(value) {
     return '<tr class="table-row"><td>Golfers:</td><td>' + value + '</td></tr>';
   }
   $(document).ready(function () {
     var table = $('#leaderboardTable').DataTable({
+      responsive: true,
       order: [[1, 'asc']],
       paging: false,
-      columnDefs: [{ visible: false, targets: [1] }],
-    });
-
-    $('#leaderboardTable').on('click', 'td.details-control', function () {
-      var tr = $(this).closest('tr');
-      var row = table.row(tr);
-
-      if (row.child.isShown()) {
-        // This row is already open - close it
-        row.child.hide();
-        tr.removeClass('shown');
-      } else {
-        // Open this row
-        row.child(format(tr.data('child-value'))).show();
-        tr.addClass('shown');
-      }
+      columnDefs: [
+        { visible: false, searchable: false, orderable: false, targets: [0] },
+        { orderData: [0], targets: [1] },
+        { responsivePriority: [10001], targets: [6] },
+        { responsivePriority: [10001], targets: [7] },
+        { responsivePriority: [10001], targets: [8] },
+        { responsivePriority: [10001], targets: [9] },
+      ],
     });
   });
 </script>

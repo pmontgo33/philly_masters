@@ -17,25 +17,33 @@ class Golfer(models.Model):
     tournament_position = models.CharField(null=True, blank=True, max_length=4)
     tournament_position_tied = models.BooleanField(default=False)
     score_to_par = models.SmallIntegerField(null=True, blank=True, default=None)
-    thru = models.PositiveSmallIntegerField(null=True, blank=True, default=None)
+    thru = models.CharField(max_length=20, default="")
     score_today = models.SmallIntegerField(null=True, blank=True, default=None)
 
     # Rounds
-    rd_one_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_one_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
-    rd_one_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
+    rounds = models.JSONField(
+        default={
+            "r1": {"tee_time": "", "strokes": "", "score_to_par": ""},
+            "r2": {"tee_time": "", "strokes": "", "score_to_par": ""},
+            "r3": {"tee_time": "", "strokes": "", "score_to_par": ""},
+            "r4": {"tee_time": "", "strokes": "", "score_to_par": ""},
+        }
+    )
+    # rd_one_tee_time = models.TimeField(null=True, blank=True, default=None)
+    # rd_one_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
+    # rd_one_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
 
-    rd_two_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_two_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
-    rd_two_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
+    # rd_two_tee_time = models.TimeField(null=True, blank=True, default=None)
+    # rd_two_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
+    # rd_two_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
 
-    rd_three_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_three_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
-    rd_three_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
+    # rd_three_tee_time = models.TimeField(null=True, blank=True, default=None)
+    # rd_three_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
+    # rd_three_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
 
-    rd_four_tee_time = models.TimeField(null=True, blank=True, default=None)
-    rd_four_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
-    rd_four_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
+    # rd_four_tee_time = models.TimeField(null=True, blank=True, default=None)
+    # rd_four_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
+    # rd_four_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
 
     # TODO Add @property for applicable world ranking
 
@@ -45,7 +53,10 @@ class Golfer(models.Model):
 
     @property
     def total_strokes(self):
-        return self.rd_one_strokes + self.rd_two_strokes + self.rd_three_strokes + self.rd_four_strokes
+        strokes = 0
+        for key, value in self.rounds.items():
+            strokes += value["strokes"]
+        return strokes
 
     @property
     def position_with_ties(self):
@@ -53,6 +64,13 @@ class Golfer(models.Model):
             return "T" + str(self.tournament_position)
         else:
             return str(self.tournament_position)
+
+    @property
+    def score_to_par_formatted(self):
+        if self.score_to_par == 0:
+            return "E"
+        else:
+            return self.score_to_par
 
     def check_tied(self):
         all_golfers_in_tournament = self.tournament.golfer_set.all()
@@ -66,15 +84,16 @@ class Golfer(models.Model):
             self.tournament_position_tied = False
 
     def save(self, *args, **kwargs):
-        current_round = self.tournament.current_round
-        if current_round == 1:
-            self.score_today = self.rd_one_score_to_par
-        elif current_round == 2:
-            self.score_today = self.rd_two_score_to_par
-        elif current_round == 3:
-            self.score_today = self.rd_three_score_to_par
-        elif current_round == 4:
-            self.score_today = self.rd_four_score_to_par
+        current_round = "r" + str(self.tournament.current_round)
+        self.score_today = self.rounds[current_round]["score_to_par"]
+        # if current_round == 1:
+        #     self.score_today = self.rd_one_score_to_par
+        # elif current_round == 2:
+        #     self.score_today = self.rd_two_score_to_par
+        # elif current_round == 3:
+        #     self.score_today = self.rd_three_score_to_par
+        # elif current_round == 4:
+        #     self.score_today = self.rd_four_score_to_par
 
         super().save(*args, **kwargs)
 
@@ -103,6 +122,43 @@ class Tournament(models.Model):
 
     def add_golfer(self, player_id, name):
         Golfer.objects.update_or_create(player_id=player_id, tournament=self, defaults={"name": name})
+
+    def low_scores_completed_rounds(self):
+        low_scores = {}
+        rounds_complete = 0
+        if self.status == "completed":
+            rounds_complete = 4
+        elif self.status == "endofday":
+            rounds_complete = self.current_round
+        else:
+            rounds_complete = self.current_round - 1
+
+        thru_exclude = ["CUT", "WD"]
+        for i in range(rounds_complete):
+            round_key = "r" + str(i + 1)
+            golfers = self.golfer_set.exclude(thru__in=thru_exclude)
+            low_golfer = min(golfers, key=lambda x: x.rounds[round_key]["strokes"])
+            low_scores.update({round_key: low_golfer.rounds[round_key]["strokes"]})
+
+        return low_scores
+
+    def update_leaderboard(self):
+        # Check if golfers are tied
+        for golfer in self.golfer_set.all():
+            golfer.check_tied()
+            golfer.save(update_fields=["tournament_position_tied"])
+
+        # Calculate raw scores and bonuses for each team in the tournament
+        low_scores = self.low_scores_completed_rounds
+        for team in self.team_set.all():
+            team.calculate_raw_score()
+            team.calculate_bonuses(low_scores)
+            team.save(update_fields=["raw_score", "bonuses"])
+
+        # Calculate the place for each team in the tournament
+        for team in self.team_set.all():
+            team.calculate_place()
+            team.save(update_fields=["place", "place_tied"])
 
     @staticmethod
     def get_tournament_from_csv():
@@ -184,6 +240,15 @@ class Team(models.Model):
             self.raw_score = all_golfers_score - worst_golfer_score
         else:
             self.raw_score = 0
+
+    def calculate_bonuses(self, low_scores):
+        bonuses = 0
+        for golfer in self.golfers.all():
+            for key, value in low_scores.items():
+                if golfer.rounds[key]["strokes"] == value:
+                    bonuses += 2
+
+        self.bonuses = bonuses
 
     def add_golfer(self, new_golfer):
         if self.golfers.count() < 5:

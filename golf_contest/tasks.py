@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import requests
 from celery import shared_task
 from django.conf import settings
@@ -73,42 +71,44 @@ def update_leaderboard_scores(tournament_pk):
         golfer = Golfer.objects.get(tournament=tournament, player_id=golfer_data["player_id"])
         golfer.tournament_position = golfer_data["position"]
         golfer.score_to_par = golfer_data["total_to_par"]
-        golfer.thru = golfer_data["holes_played"]
 
-        round = next(r for r in golfer_data["rounds"] if r["round_number"] == 1)
-        if round["tee_time_local"] is not None:
-            golfer.rd_one_tee_time = datetime.strptime(round["tee_time_local"], "%H:%M")
-        golfer.rd_one_strokes = round["strokes"]
-        golfer.rd_one_score_to_par = round["total_to_par"]
+        if golfer_data["status"] == "active":
+            golfer.thru = golfer_data["holes_played"]
+        elif golfer_data["status"] == "between rounds":
+            golfer.thru = ""  # MAKE THIS TEE TIME
+        elif golfer_data["status"] == "complete":
+            golfer.thru = "F"
+        elif golfer_data["status"] == "endofday":
+            golfer.thru = "F"
+        else:
+            golfer.thru = golfer_data["status"].upper()
 
-        round = next(r for r in golfer_data["rounds"] if r["round_number"] == 2)
-        if round["tee_time_local"] is not None:
-            golfer.rd_two_tee_time = datetime.strptime(round["tee_time_local"], "%H:%M")
-        golfer.rd_two_strokes = round["strokes"]
-        golfer.rd_two_score_to_par = round["total_to_par"]
-
-        round = next(r for r in golfer_data["rounds"] if r["round_number"] == 3)
-        if round["tee_time_local"] is not None:
-            golfer.rd_three_tee_time = datetime.strptime(round["tee_time_local"], "%H:%M")
-        golfer.rd_three_strokes = round["strokes"]
-        golfer.rd_three_score_to_par = round["total_to_par"]
-
-        round = next(r for r in golfer_data["rounds"] if r["round_number"] == 4)
-        if round["tee_time_local"] is not None:
-            golfer.rd_four_tee_time = datetime.strptime(round["tee_time_local"], "%H:%M")
-        golfer.rd_four_strokes = round["strokes"]
-        golfer.rd_four_score_to_par = round["total_to_par"]
+        for round in golfer_data["rounds"]:
+            round_number = "r" + str(round["round_number"])
+            golfer.rounds[round_number]["strokes"] = round["strokes"]
+            golfer.rounds[round_number]["tee_time"] = round["tee_time_local"]
+            golfer.rounds[round_number]["score_to_par"] = round["total_to_par"]
 
         golfer.save()
 
-    for golfer in tournament.golfer_set.all():
-        golfer.check_tied()
-        golfer.save(update_fields=["tournament_position_tied"])
+    tournament.update_leaderboard
 
-    for team in tournament.team_set.all():
-        team.calculate_raw_score()
-        team.save(update_fields=["raw_score"])
 
-    for team in tournament.team_set.all():
-        team.calculate_place()
-        team.save(update_fields=["place", "place_tied"])
+def test(tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    low_scores = {}
+    rounds_complete = 0
+    if tournament.status == "completed":
+        rounds_complete = 4
+    elif tournament.status == "endofday":
+        rounds_complete = tournament.current_round
+    else:
+        rounds_complete = tournament.current_round - 1
+
+    thru_exclude = ["CUT", "WD"]
+    for i in range(rounds_complete):
+        round_key = "r" + str(i + 1)
+        golfers = tournament.golfer_set.exclude(thru__in=thru_exclude)
+        low_golfer = min(golfers, key=lambda x: x.rounds[round_key]["strokes"])
+        low_scores.update({round_key: low_golfer.rounds[round_key]["strokes"]})
+    print(low_scores)

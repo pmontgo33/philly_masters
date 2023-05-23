@@ -1,61 +1,71 @@
-{% extends "golf_contest/base.html" %} {% block content %}
+{% extends "golf_contest/base.html" %}
 
-<h2>{{tournament}} - Standings</h2>
+{% block content %}
+<h2>Standings - {{tournament}}</h2>
 
-<table id="standingsTable" class="display" style="width: 100%">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Place</th>
-      <th>Name</th>
-      <th>Participant</th>
-      <th class="text-center">Raw Score</th>
-      <th class="text-center">>Bonuses</th>
-      <th class="text-center">Team Score</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for team in teams %}
-    <tr
-      class="table-row"
-      data-child-value="
-      {% for golfer in team.golfers.all %}
-        <td>{{ golfer.name }}: {{golfer.score_to_par}}</td>
-      {% endfor %}"
-    >
-      <td class="details-control"></td>
-      <td class="text-center">{{ team.place_with_ties }}</td>
-      <td>{{ team.name }}</td>
-      <td>{{ team.user.email }}</td>
-      <td class="text-center">{{ team.raw_score }}</td>
-      <td class="text-center">{{ team.bonuses }}</td>
-      <td class="text-center">{{ team.score }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <th></th>
-      <th>Place</th>
-      <th>Name</th>
-      <th>Participant</th>
-      <th class="text-center">Raw Score</th>
-      <th class="text-center">Bonuses</th>
-      <th class="text-center">Team Score</th>
-    </tr>
-  </tfoot>
-</table>
+<div class="container" style="width: 75%">
+  <table id="standingsTable" class="display" style="width: 100%">
+    <thead>
+      <tr>
+        <th></th>
+        <th>PLACE NO TIES</th>
+        <th>Place</th>
+        <th>Name</th>
+        <th>Participant</th>
+        <th class="text-center">Raw Score</th>
+        <th class="text-center">Bonuses</th>
+        <th class="text-center">Team Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in teams %}
+        <tr class="table-row" data-child-value="{% for golfer in team.golfers.all %}<td>{{ golfer.name }}: {{golfer.score_to_par}}</td>{% endfor %}">
+          <td class="details-control"></td>
+          <td class="text-center">{{ team.place }}</td>
+          <td class="text-center">{{ team.place_with_ties }}</td>
+          <td>{{ team.name }}</td>
+          <td>{{ team.user.email }}</td>
+          <td class="text-center">{{ team.raw_score }}</td>
+          <td class="text-center">{{ team.bonuses }}</td>
+          <td class="text-center"><strong>{{ team.score }}</strong></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th></th>
+        <th>PLACE NO TIES</th>
+        <th>Place</th>
+        <th>Name</th>
+        <th>Participant</th>
+        <th class="text-center">Raw Score</th>
+        <th class="text-center">Bonuses</th>
+        <th class="text-center">Team Score</th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% endblock %}
 
-{% endblock %} {% block script %}
-
+{% block script %}
 <script>
   function format(value) {
     return '<tr class="table-row"><td>Golfers:</td><td>' + value + '</td></tr>';
   }
   $(document).ready(function () {
     var table = $('#standingsTable').DataTable({
-      order: [[6, 'asc']],
+      responsive: {
+        details: false,
+      },
+      order: [[2, 'asc']],
       paging: false,
+      columnDefs: [
+        { orderable: false, targets: [0] },
+        { visible: false, searchable: false, targets: [1] },
+        { orderData: [1], targets: [2] },
+        { responsivePriority: [10001], targets: [5] },
+        { responsivePriority: [10001], targets: [6] },
+      ],
     });
 
     $('#standingsTable').on('click', 'td.details-control', function () {

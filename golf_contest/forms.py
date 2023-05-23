@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from .models import Team
+from .models import Team, Tournament
 
 
 class TeamForm(forms.ModelForm):
@@ -39,3 +39,9 @@ class TeamForm(forms.ModelForm):
         # self.helper.form_action = 'submit_survey'
 
         self.helper.add_input(Submit("submit", "Submit"))
+
+
+class TournamentForm(forms.ModelForm):
+    class Meta:
+        model = Tournament
+        fields = "tournament_id"
