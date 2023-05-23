@@ -45,3 +45,12 @@ class TournamentForm(forms.ModelForm):
     class Meta:
         model = Tournament
         fields = ("tournament_id",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["tournament_id"].label = "Enter Tournament ID to Import New Tournament"
+        self.helper = FormHelper()
+        self.helper.form_id = "id-exampleForm"
+        self.helper.form_class = "blueForms"
+        self.helper.form_method = "post"
+        self.helper.add_input(Submit("submit", "Submit"))
