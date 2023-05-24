@@ -91,7 +91,7 @@ def update_leaderboard_scores(tournament_pk):
 
         golfer.save()
 
-    tournament.update_leaderboard
+    tournament.update_leaderboard()
 
 
 def test(tournament_pk):

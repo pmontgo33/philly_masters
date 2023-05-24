@@ -1,9 +1,14 @@
 {% extends "golf_contest/base.html" %}
 
 {% block content %}
-<h2>Leaderboard - {{tournament}}</h2>
+  <nav class="nav nav-tabs">
+    <a class="nav-link tab" href="{% url 'standings' pk=pk %}">Standings</a>
+    <a class="nav-link active-tab" aria-current="page" href="{% url 'leaderboard' pk=pk %}">Leaderboard</a>
+    <a class="nav-link tab" href="#">Link</a>
+  </nav>
 
-<div class="container" style="width: 80%">
+  <h4>{{ tournament }}</h4>
+  <p>{{ tournament.start_date }}</p>
   <table id="leaderboardTable" class="display" style="width: 100%">
     <thead>
       <tr>
@@ -79,7 +84,6 @@
       </tr>
     </tfoot>
   </table>
-</div>
 {% endblock %}
 
 {% block script %}

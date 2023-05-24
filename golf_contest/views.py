@@ -17,13 +17,13 @@ def index(request):
 def standings(request, pk):
     tournament = Tournament.objects.get(pk=pk)
     teams = tournament.team_set.all()
-    return render(request, "golf_contest/standings.html", {"tournament": tournament, "teams": teams})
+    return render(request, "golf_contest/standings.html", {"tournament": tournament, "teams": teams, "pk": pk})
 
 
 def leaderboard(request, pk):
     tournament = Tournament.objects.get(pk=pk)
     golfers = tournament.golfer_set.all()
-    return render(request, "golf_contest/leaderboard.html", {"tournament": tournament, "golfers": golfers})
+    return render(request, "golf_contest/leaderboard.html", {"tournament": tournament, "golfers": golfers, "pk": pk})
 
 
 class NewTournamentView(FormView):

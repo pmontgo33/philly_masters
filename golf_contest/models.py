@@ -149,7 +149,7 @@ class Tournament(models.Model):
             golfer.save(update_fields=["tournament_position_tied"])
 
         # Calculate raw scores and bonuses for each team in the tournament
-        low_scores = self.low_scores_completed_rounds
+        low_scores = self.low_scores_completed_rounds()
         for team in self.team_set.all():
             team.calculate_raw_score()
             team.calculate_bonuses(low_scores)
@@ -247,6 +247,8 @@ class Team(models.Model):
             for key, value in low_scores.items():
                 if golfer.rounds[key]["strokes"] == value:
                     bonuses += 2
+            if golfer == self.tournament.champion:
+                bonuses += 2
 
         self.bonuses = bonuses
 

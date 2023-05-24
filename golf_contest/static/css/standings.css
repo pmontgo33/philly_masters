@@ -11,8 +11,16 @@ body {
   color: #fff;
   cursor: pointer;
 }
-.nav-link {
-  margin-right: 1em !important;
+.tab {
+  color: #04581a;
+  cursor: pointer;
+}
+.active-tab {
+  /* color: #04581a; */
+  /* background-color: #FFFF00; */
+  color: #04581a;
+  font-weight: bold;
+  cursor: pointer;
 }
 .nav-link:hover {
   color: #000;
