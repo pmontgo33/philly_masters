@@ -1,16 +1,19 @@
 {% extends "golf_contest/base.html" %}
 
 {% block content %}
-<div class="row">
+<div class="row pt-2">
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link active-tab" href="{% url 'standings' pk=pk %}">Standings</a>
+      <a class="nav-link active" aria-current="page" href="{% url 'standings' pk=pk %}">Standings</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link tab" href="{% url 'leaderboard' pk=pk %}">Leaderboard</a>
+      <a class="nav-link" href="{% url 'leaderboard' pk=pk %}">Leaderboard</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link tab" href="#">Link</a>
+      <a class="nav-link" href="#">Link</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link disabled">Disabled</a>
     </li>
   </ul>
 </div>

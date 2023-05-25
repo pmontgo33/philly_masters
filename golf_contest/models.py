@@ -246,9 +246,9 @@ class Team(models.Model):
         for golfer in self.golfers.all():
             for key, value in low_scores.items():
                 if golfer.rounds[key]["strokes"] == value:
-                    bonuses += 2
+                    bonuses -= 2
             if golfer == self.tournament.champion:
-                bonuses += 2
+                bonuses -= 2
 
         self.bonuses = bonuses
 

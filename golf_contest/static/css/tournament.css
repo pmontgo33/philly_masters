@@ -1,0 +1,16 @@
+.navbar {
+  background: #04581a;
+}
+.table-row {
+  font-size: 12px;
+}
+
+td.details-control {
+  background: url('http://www.datatables.net/examples/resources/details_open.png')
+    no-repeat center center;
+  cursor: pointer;
+}
+tr.shown td.details-control {
+  background: url('http://www.datatables.net/examples/resources/details_close.png')
+    no-repeat center center;
+}
