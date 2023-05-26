@@ -1,6 +1,12 @@
 {% extends "golf_contest/base.html" %}
 
 {% block content %}
+{% load golftags %}
+<div class="container-fluid" style="max-width:800px">
+<div class="row pt-2">
+  <h4>{{ tournament }}</h4>
+    <p>{{ tournament.start_date }}</p>
+</div>
 <div class="row pt-2">
   <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -17,9 +23,7 @@
     </li>
   </ul>
 </div>
-  <h4>{{ tournament }}</h4>
-  <p>{{ tournament.start_date }}</p>
-  <table id="standingsTable" class="display" style="width: 100%">
+  <table id="standingsTable" class="display" style="width:100%">
     <thead>
       <tr>
         <th></th>
@@ -34,15 +38,21 @@
     </thead>
     <tbody>
       {% for team in teams %}
-        <tr class="table-row" data-child-value="{% for golfer in team.golfers.all %}<td>{{ golfer.name }}: {{golfer.score_to_par}}</td>{% endfor %}">
+        <!-- <tr class="table-row" data-child-value=
+          "<tr class='table-row'>{% for golfer in team.golfers.all %}<td>{{ golfer.name }}</td>{% endfor %}</tr>
+          <tr class='table-row'>{% for golfer in team.golfers.all %}<td>{{golfer.score_to_par}}</td>{% endfor %}</tr>"
+        > -->
+        <tr class="table-row" data-child-value=
+          "<tr><th>Golfer</th><th>Score</th></tr>{% for golfer in team.golfers.all %}<tr class='table-row'><td>{{ golfer.name }}</td><td>{{golfer.score_to_par}}</td></tr>{% endfor %}"
+        >
           <td class="details-control"></td>
           <td class="text-center">{{ team.place }}</td>
           <td class="text-center">{{ team.place_with_ties }}</td>
           <td>{{ team.name }}</td>
           <td>{{ team.user.email }}</td>
-          <td class="text-center">{{ team.raw_score }}</td>
-          <td class="text-center">{{ team.bonuses }}</td>
-          <td class="text-center"><strong>{{ team.score }}</strong></td>
+          <td class="text-center">{{ team.raw_score|golf_score }}</td>
+          <td class="text-center">{{ team.bonuses|golf_score }}</td>
+          <td class="text-center"><strong>{{ team.score|golf_score }}</strong></td>
         </tr>
       {% endfor %}
     </tbody>
@@ -59,12 +69,13 @@
       </tr>
     </tfoot>
   </table>
+</div>
 {% endblock %}
 
 {% block script %}
 <script>
   function format(value) {
-    return '<tr class="table-row"><td>Golfers:</td><td>' + value + '</td></tr>';
+    return value;
   }
   $(document).ready(function () {
     var table = $('#standingsTable').DataTable({
@@ -77,8 +88,8 @@
         { orderable: false, targets: [0] },
         { visible: false, searchable: false, targets: [1] },
         { orderData: [1], targets: [2] },
-        { responsivePriority: [10001], targets: [5] },
-        { responsivePriority: [10001], targets: [6] },
+        { responsivePriority: [1], targets: [-1] },
+        { responsivePriority: [2], targets: [2] },
       ],
     });
 

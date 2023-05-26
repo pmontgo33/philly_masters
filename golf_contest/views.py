@@ -8,6 +8,7 @@ from django.views.generic.edit import FormView
 
 from .forms import TeamForm, TournamentForm
 from .models import Golfer, Tournament
+from .tasks import update_leaderboard_golfers
 
 
 def index(request):
@@ -67,6 +68,9 @@ class NewTournamentView(FormView):
             new_tournament.current_round = 0
 
         new_tournament.save()
+        update_leaderboard_golfers(
+            new_tournament.pk
+        )  # should this function move to here in the Tournament Model? Then call it from tasks.py
         return super().form_valid(form)
 
 

@@ -1,89 +1,104 @@
 {% extends "golf_contest/base.html" %}
 
 {% block content %}
-  <nav class="nav nav-tabs">
-    <a class="nav-link tab" href="{% url 'standings' pk=pk %}">Standings</a>
-    <a class="nav-link active-tab" aria-current="page" href="{% url 'leaderboard' pk=pk %}">Leaderboard</a>
-    <a class="nav-link tab" href="#">Link</a>
-  </nav>
-
+{% load golftags %}
+<div class="container-fluid" style="max-width:800px">
+<div class="row pt-2">
   <h4>{{ tournament }}</h4>
-  <p>{{ tournament.start_date }}</p>
-  <table id="leaderboardTable" class="display" style="width: 100%">
-    <thead>
-      <tr>
-        <th>POS NO TIES</th>
-        <th class="text-center">POS</th>
-        <th>Player</th>
-        <th class="text-center">Total</th>
-        <th class="text-center">Today</th>
-        <th class="text-center">Thru</th>
-        <th class="text-center">R1</th>
-        <th class="text-center">R2</th>
-        <th class="text-center">R3</th>
-        <th class="text-center">R4</th>
-        <th class="text-center">Strokes</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for golfer in golfers %}
-      <tr class="table-row" data-child-value="HI">
-        <td>{{ golfer.tournament_position }}</td>
-        <td class="text-center">{{ golfer.position_with_ties }}</td>
-        <td>{{ golfer.name }}</td>
-        <td class="text-center">
-          <strong>{{ golfer.score_to_par_formatted }}</strong>
-        </td>
-        <td class="text-center">{{ golfer.score_today }}</td>
-        <td class="text-center">{{ golfer.thru }}</td>
-        <td class="text-center">
-          {% if golfer.rounds.r1.strokes == 0 %}
-            -
-          {% else %}
-            {{ golfer.rounds.r1.strokes }}
-          {% endif %}
-        </td>
-        <td class="text-center">
-          {% if golfer.rounds.r2.strokes == 0 %}
-            -
-          {% else %}
-            {{ golfer.rounds.r2.strokes }}
-          {% endif %}
-        </td>
-        <td class="text-center">
-          {% if golfer.rounds.r3.strokes == 0 %}
-            -
-          {% else %}
-            {{ golfer.rounds.r3.strokes }}
-          {% endif %}
-        </td>
-        <td class="text-center">
-          {% if golfer.rounds.r4.strokes == 0 %}
-            -
-          {% else %}
-            {{ golfer.rounds.r4.strokes }}
-          {% endif %}
-        </td>
-        <td class="text-center">{{ golfer.total_strokes }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    <tfoot>
-      <tr>
-        <th>POS NO TIES</th>
-        <th class="text-center">POS</th>
-        <th>Player</th>
-        <th class="text-center">Total</th>
-        <th class="text-center">Today</th>
-        <th class="text-center">Thru</th>
-        <th class="text-center">R1</th>
-        <th class="text-center">R2</th>
-        <th class="text-center">R3</th>
-        <th class="text-center">R4</th>
-        <th class="text-center">Strokes</th>
-      </tr>
-    </tfoot>
-  </table>
+    <p>{{ tournament.start_date }}</p>
+</div>
+<div class="row pt-2">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'standings' pk=pk %}">Standings</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" aria-current="page" href="{% url 'leaderboard' pk=pk %}">Leaderboard</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Link</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link disabled">Disabled</a>
+    </li>
+  </ul>
+</div>
+<table id="leaderboardTable" class="display" style="width: 100%">
+  <thead>
+    <tr>
+      <th>POS NO TIES</th>
+      <th class="text-center">POS</th>
+      <th>Player</th>
+      <th class="text-center">Total</th>
+      <th class="text-center">Today</th>
+      <th class="text-center">Thru</th>
+      <th class="text-center">R1</th>
+      <th class="text-center">R2</th>
+      <th class="text-center">R3</th>
+      <th class="text-center">R4</th>
+      <th class="text-center">Strokes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for golfer in golfers %}
+    <tr class="table-row" data-child-value="HI">
+      <td>{{ golfer.tournament_position }}</td>
+      <td class="text-center">{{ golfer.position_with_ties }}</td>
+      <td>{{ golfer.name }}</td>
+      <td class="text-center">
+        <strong>{{ golfer.score_to_par|golf_score }}</strong>
+      </td>
+      <td class="text-center">{{ golfer.score_today|golf_score }}</td>
+      <td class="text-center">{{ golfer.thru }}</td>
+      <td class="text-center">
+        {% if golfer.rounds.r1.strokes == 0 %}
+          -
+        {% else %}
+          {{ golfer.rounds.r1.strokes }}
+        {% endif %}
+      </td>
+      <td class="text-center">
+        {% if golfer.rounds.r2.strokes == 0 %}
+          -
+        {% else %}
+          {{ golfer.rounds.r2.strokes }}
+        {% endif %}
+      </td>
+      <td class="text-center">
+        {% if golfer.rounds.r3.strokes == 0 %}
+          -
+        {% else %}
+          {{ golfer.rounds.r3.strokes }}
+        {% endif %}
+      </td>
+      <td class="text-center">
+        {% if golfer.rounds.r4.strokes == 0 %}
+          -
+        {% else %}
+          {{ golfer.rounds.r4.strokes }}
+        {% endif %}
+      </td>
+      <td class="text-center">{{ golfer.total_strokes }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>POS NO TIES</th>
+      <th class="text-center">POS</th>
+      <th>Player</th>
+      <th class="text-center">Total</th>
+      <th class="text-center">Today</th>
+      <th class="text-center">Thru</th>
+      <th class="text-center">R1</th>
+      <th class="text-center">R2</th>
+      <th class="text-center">R3</th>
+      <th class="text-center">R4</th>
+      <th class="text-center">Strokes</th>
+    </tr>
+  </tfoot>
+</table>
+</div>
 {% endblock %}
 
 {% block script %}

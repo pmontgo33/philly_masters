@@ -6,6 +6,19 @@ from golf_contest.models import Golfer, Tournament
 
 
 @shared_task
+def update_tournament_golfers(tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    tournament.new_update_golfers()
+    tournament.new_update_scores()
+
+
+@shared_task
+def update_tournament_scores(tournament_pk):
+    tournament = Tournament.objects.get(pk=tournament_pk)
+    tournament.new_update_scores()
+
+
+@shared_task
 def update_leaderboard_golfers(tournament_pk):
     # Before tee times are set, entry list has the best list of golfers in the tournament.
     # After tee times are set, leaderboard may have golfers that entry list does not, so this
@@ -91,7 +104,7 @@ def update_leaderboard_scores(tournament_pk):
 
         golfer.save()
 
-    tournament.update_leaderboard()
+    tournament.leaderboard_calculations()
 
 
 def test(tournament_pk):

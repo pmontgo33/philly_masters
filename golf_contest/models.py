@@ -1,13 +1,12 @@
 import csv
 import datetime
 
+import requests
 from django.conf import settings
 from django.db import models
 from django.db.models import Max, Sum
 
 from mysite.users.models import User
-
-# Create your models here.
 
 
 class Golfer(models.Model):
@@ -29,21 +28,6 @@ class Golfer(models.Model):
             "r4": {"tee_time": "", "strokes": "", "score_to_par": None},
         }
     )
-    # rd_one_tee_time = models.TimeField(null=True, blank=True, default=None)
-    # rd_one_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
-    # rd_one_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
-
-    # rd_two_tee_time = models.TimeField(null=True, blank=True, default=None)
-    # rd_two_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
-    # rd_two_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
-
-    # rd_three_tee_time = models.TimeField(null=True, blank=True, default=None)
-    # rd_three_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
-    # rd_three_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
-
-    # rd_four_tee_time = models.TimeField(null=True, blank=True, default=None)
-    # rd_four_strokes = models.PositiveSmallIntegerField(null=True, blank=True, default=0)
-    # rd_four_score_to_par = models.SmallIntegerField(null=True, blank=True, default=0)
 
     # TODO Add @property for applicable world ranking
 
@@ -69,6 +53,8 @@ class Golfer(models.Model):
     def score_to_par_formatted(self):
         if self.score_to_par == 0:
             return "E"
+        elif self.score_to_par > 0:
+            return "+" + str(self.score_to_par)
         else:
             return self.score_to_par
 
@@ -84,16 +70,9 @@ class Golfer(models.Model):
             self.tournament_position_tied = False
 
     def save(self, *args, **kwargs):
-        current_round = "r" + str(self.tournament.current_round)
-        self.score_today = self.rounds[current_round]["score_to_par"]
-        # if current_round == 1:
-        #     self.score_today = self.rd_one_score_to_par
-        # elif current_round == 2:
-        #     self.score_today = self.rd_two_score_to_par
-        # elif current_round == 3:
-        #     self.score_today = self.rd_three_score_to_par
-        # elif current_round == 4:
-        #     self.score_today = self.rd_four_score_to_par
+        if self.tournament.current_round > 0:
+            current_round = "r" + str(self.tournament.current_round)
+            self.score_today = self.rounds[current_round]["score_to_par"]
 
         super().save(*args, **kwargs)
 
@@ -142,7 +121,91 @@ class Tournament(models.Model):
 
         return low_scores
 
-    def update_leaderboard(self):
+    def new_update_golfers(self):
+        # Before tee times are set, entry list has the best list of golfers in the tournament.
+        # After tee times are set, leaderboard may have golfers that entry list does not, so this
+        # pulls golfers from both.
+
+        # Pull Golfers from entry-list endpoint
+        url = "https://golf-leaderboard-data.p.rapidapi.com/entry-list/" + str(self.tournament_id)
+        headers = {
+            "X-RapidAPI-Key": settings.GOLF_LEADERBOARD_API_KEY,
+            "X-RapidAPI-Host": "golf-leaderboard-data.p.rapidapi.com",
+        }
+        response = requests.get(url, headers=headers)
+
+        for golfer in response.json()["results"]["entry_list"]:
+            player_id = golfer["player_id"]
+            name = golfer["first_name"] + " " + golfer["last_name"]
+            self.add_golfer(player_id=player_id, name=name)
+
+        # Pull Golfers from leaderboard endpoint
+        url = "https://golf-leaderboard-data.p.rapidapi.com/leaderboard/" + str(self.tournament_id)
+        headers = {
+            "X-RapidAPI-Key": settings.GOLF_LEADERBOARD_API_KEY,
+            "X-RapidAPI-Host": "golf-leaderboard-data.p.rapidapi.com",
+        }
+        response = requests.get(url, headers=headers)
+
+        for golfer in response.json()["results"]["leaderboard"]:
+            player_id = golfer["player_id"]
+            name = golfer["first_name"] + " " + golfer["last_name"]
+            self.add_golfer(player_id=player_id, name=name)
+
+        for golfer in self.golfer_set.all():
+            # check if the golfer is in the
+            if (
+                next(
+                    (
+                        item
+                        for item in response.json()["results"]["leaderboard"]
+                        if item["player_id"] == golfer.player_id
+                    ),
+                    None,
+                )
+                is None
+            ):
+                golfer.delete()
+
+    def new_update_scores(self):
+        url = "https://golf-leaderboard-data.p.rapidapi.com/leaderboard/" + str(self.tournament_id)
+        headers = {
+            "X-RapidAPI-Key": settings.GOLF_LEADERBOARD_API_KEY,
+            "X-RapidAPI-Host": "golf-leaderboard-data.p.rapidapi.com",
+        }
+        response = requests.get(url, headers=headers)
+
+        self.status = response.json()["results"]["tournament"]["live_details"]["status"]
+        self.current_round = response.json()["results"]["tournament"]["live_details"]["current_round"]
+        self.save(update_fields=["status", "current_round"])
+
+        for golfer_data in response.json()["results"]["leaderboard"]:
+            golfer = Golfer.objects.get(tournament=self, player_id=golfer_data["player_id"])
+            golfer.tournament_position = golfer_data["position"]
+            golfer.score_to_par = golfer_data["total_to_par"]
+
+            if golfer_data["status"] == "active":
+                golfer.thru = golfer_data["holes_played"]
+            elif golfer_data["status"] == "between rounds":
+                golfer.thru = ""  # MAKE THIS TEE TIME
+            elif golfer_data["status"] == "complete":
+                golfer.thru = "F"
+            elif golfer_data["status"] == "endofday":
+                golfer.thru = "F"
+            else:
+                golfer.thru = golfer_data["status"].upper()
+
+            for round in golfer_data["rounds"]:
+                round_number = "r" + str(round["round_number"])
+                golfer.rounds[round_number]["strokes"] = round["strokes"]
+                golfer.rounds[round_number]["tee_time"] = round["tee_time_local"]
+                golfer.rounds[round_number]["score_to_par"] = round["total_to_par"]
+
+            golfer.save()
+
+        self.leaderboard_calculations()
+
+    def leaderboard_calculations(self):
         # Check if golfers are tied
         for golfer in self.golfer_set.all():
             golfer.check_tied()
