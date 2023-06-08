@@ -21,6 +21,7 @@ class TeamForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["tournament"].disabled = True
+        self.fields["name"].label = "Team Name"
         self.fields["golfer_1"].label = "Golfer 1"
         self.fields["golfer_1"].queryset = queryset
         self.fields["golfer_2"].label = "Golfer 2"

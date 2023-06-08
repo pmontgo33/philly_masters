@@ -5,13 +5,13 @@ from django.urls import include, path
 from django.views import defaults as default_views
 
 urlpatterns = [
-    path("", include("golf_contest.urls")),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("mysite.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
+    path("", include("golf_contest.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

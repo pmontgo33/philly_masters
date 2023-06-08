@@ -23,6 +23,7 @@
     </li>
   </ul>
 </div>
+<div class="row pt-2">
 <table id="leaderboardTable" class="display" style="width: 100%">
   <thead>
     <tr>
@@ -49,7 +50,7 @@
         <strong>{{ golfer.score_to_par|golf_score }}</strong>
       </td>
       <td class="text-center">{{ golfer.score_today|golf_score }}</td>
-      <td class="text-center">{{ golfer.thru }}</td>
+      <td class="text-center">{{ golfer.thru_display }}</td>
       <td class="text-center">
         {% if golfer.rounds.r1.strokes == 0 %}
           -
@@ -98,6 +99,7 @@
     </tr>
   </tfoot>
 </table>
+</div>
 </div>
 {% endblock %}
 

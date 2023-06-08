@@ -16,7 +16,9 @@ class Golfer(models.Model):
     tournament_position = models.CharField(null=True, blank=True, max_length=4)
     tournament_position_tied = models.BooleanField(default=False)
     score_to_par = models.SmallIntegerField(null=True, blank=True, default=None)
-    thru = models.CharField(max_length=20, default="")
+    status = models.CharField(max_length=30)
+    thru_display = models.CharField(max_length=20, default="")
+    thru = models.PositiveSmallIntegerField(null=True, blank=True, default=None)
     score_today = models.SmallIntegerField(null=True, blank=True, default=None)
 
     # Rounds
@@ -39,7 +41,8 @@ class Golfer(models.Model):
     def total_strokes(self):
         strokes = 0
         for key, value in self.rounds.items():
-            strokes += value["strokes"]
+            if value["strokes"] != "":
+                strokes += value["strokes"]
         return strokes
 
     @property
@@ -48,15 +51,6 @@ class Golfer(models.Model):
             return "T" + str(self.tournament_position)
         else:
             return str(self.tournament_position)
-
-    @property
-    def score_to_par_formatted(self):
-        if self.score_to_par == 0:
-            return "E"
-        elif self.score_to_par > 0:
-            return "+" + str(self.score_to_par)
-        else:
-            return self.score_to_par
 
     def check_tied(self):
         all_golfers_in_tournament = self.tournament.golfer_set.all()
@@ -71,8 +65,11 @@ class Golfer(models.Model):
 
     def save(self, *args, **kwargs):
         if self.tournament.current_round > 0:
-            current_round = "r" + str(self.tournament.current_round)
-            self.score_today = self.rounds[current_round]["score_to_par"]
+            if self.status == "cut" or self.status == "withdrawn":
+                self.score_today = None
+            else:
+                current_round = "r" + str(self.tournament.current_round)
+                self.score_today = self.rounds[current_round]["score_to_par"]
 
         super().save(*args, **kwargs)
 
@@ -115,7 +112,7 @@ class Tournament(models.Model):
         thru_exclude = ["CUT", "WD"]
         for i in range(rounds_complete):
             round_key = "r" + str(i + 1)
-            golfers = self.golfer_set.exclude(thru__in=thru_exclude)
+            golfers = self.golfer_set.exclude(thru_display__in=thru_exclude)
             low_golfer = min(golfers, key=lambda x: x.rounds[round_key]["strokes"])
             low_scores.update({round_key: low_golfer.rounds[round_key]["strokes"]})
 
@@ -183,33 +180,62 @@ class Tournament(models.Model):
             golfer = Golfer.objects.get(tournament=self, player_id=golfer_data["player_id"])
             golfer.tournament_position = golfer_data["position"]
             golfer.score_to_par = golfer_data["total_to_par"]
-
-            if golfer_data["status"] == "active":
-                golfer.thru = golfer_data["holes_played"]
-            elif golfer_data["status"] == "between rounds":
-                golfer.thru = ""  # MAKE THIS TEE TIME
-            elif golfer_data["status"] == "complete":
-                golfer.thru = "F"
-            elif golfer_data["status"] == "endofday":
-                golfer.thru = "F"
-            else:
-                golfer.thru = golfer_data["status"].upper()
+            golfer.status = golfer_data["status"]
+            golfer.thru = golfer_data["holes_played"]
 
             for round in golfer_data["rounds"]:
                 round_number = "r" + str(round["round_number"])
                 golfer.rounds[round_number]["strokes"] = round["strokes"]
-                golfer.rounds[round_number]["tee_time"] = round["tee_time_local"]
                 golfer.rounds[round_number]["score_to_par"] = round["total_to_par"]
+
+                if round["tee_time_local"] is None:
+                    golfer.rounds[round_number]["tee_time"] = None
+                else:
+                    d = datetime.datetime.strptime(round["tee_time_local"], "%H:%M")
+                    golfer.rounds[round_number]["tee_time"] = d.strftime("%I:%M %p")
+
+            # if golfer_data["status"] == "active":
+            #     golfer.thru = golfer_data["holes_played"]
+            # elif golfer_data["status"] == "between rounds":
+            #     next_round = "r" + str(self.current_round)
+            #     golfer.thru = golfer.rounds[next_round]["tee_time"]
+            # elif golfer_data["status"] == "complete":
+            #     golfer.thru = "F"
+            # elif golfer_data["status"] == "endofday":
+            #     golfer.thru = "F"
+            # else:
+            #     golfer.thru = golfer_data["status"].upper()
 
             golfer.save()
 
         self.leaderboard_calculations()
 
     def leaderboard_calculations(self):
-        # Check if golfers are tied
+        # Check if golfers are tied. Assign thru value
         for golfer in self.golfer_set.all():
             golfer.check_tied()
-            golfer.save(update_fields=["tournament_position_tied"])
+
+            if golfer.status == "active":
+                if golfer.thru == "0":
+                    next_round = "r" + str(self.current_round)
+                    golfer.thru_display = golfer.rounds[next_round]["tee_time"]
+                else:
+                    golfer.thru_display = golfer.thru
+            elif golfer.status == "between rounds":
+                next_round = "r" + str(self.current_round)
+                golfer.thru_display = golfer.rounds[next_round]["tee_time"]
+            elif golfer.status == "complete":
+                golfer.thru_display = "F"
+            elif golfer.status == "endofday":
+                golfer.thru_display = "F"
+            elif golfer.status == "withdrawn":
+                golfer.thru_display = "WD"
+            elif golfer.status == "cut":
+                golfer.thru_display = "CUT"
+            else:
+                golfer.thru_display = golfer.status.upper()
+
+            golfer.save(update_fields=["tournament_position_tied", "thru_display"])
 
         # Calculate raw scores and bonuses for each team in the tournament
         low_scores = self.low_scores_completed_rounds()
@@ -222,6 +248,38 @@ class Tournament(models.Model):
         for team in self.team_set.all():
             team.calculate_place()
             team.save(update_fields=["place", "place_tied"])
+
+    def convert_tee_times(self):
+        for golfer in self.golfer_set.all():
+            print(golfer)
+            for i in range(1, 5):
+                round = "r" + str(i)
+                print(round)
+                if golfer.rounds[round]["tee_time"] is not None:
+                    if "M" not in golfer.rounds[round]["tee_time"]:
+                        d = datetime.datetime.strptime(golfer.rounds[round]["tee_time"], "%H:%M")
+                        golfer.rounds[round]["tee_time"] = d.strftime("%-I:%M %p")
+                    else:
+                        d = datetime.datetime.strptime(golfer.rounds[round]["tee_time"], "%I:%M %p")
+                        golfer.rounds[round]["tee_time"] = d.strftime("%-I:%M %p")
+
+            if golfer.status == "active":
+                if golfer.thru == 0:
+                    next_round = "r" + str(self.current_round)
+                    golfer.thru_display = golfer.rounds[next_round]["tee_time"]
+                else:
+                    golfer.thru_display = golfer.thru
+            elif golfer.status == "between rounds":
+                next_round = "r" + str(self.current_round)
+                golfer.thru_display = golfer.rounds[next_round]["tee_time"]
+            elif golfer.status == "complete":
+                golfer.thru_display = "F"
+            elif golfer.status == "endofday":
+                golfer.thru_display = "F"
+            else:
+                golfer.thru_display = golfer.status.upper()
+
+            golfer.save(update_fields=["thru_display", "rounds"])
 
     @staticmethod
     def get_tournament_from_csv():

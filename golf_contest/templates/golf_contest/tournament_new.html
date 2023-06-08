@@ -8,9 +8,13 @@
 {% load static %}
 {% load crispy_forms_tags%}
 
-<h2>New Tournament</h2>
-<div class="container" style="width: 50%">
-    {% crispy form %}
+<div class="container-fluid" style="max-width:800px">
+    <div class="row pt-2">
+      <h4>New Tournament</h4>
+    </div>
+    <div class="row pt-2">
+        {% crispy form %}
+    </div>
 </div>
 
 {% endblock %}
